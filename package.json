@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "A JS Game Engine",
   "main": "main.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,6 +15,7 @@
   "author": "DarkSystem",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@kmamal/sdl": "^0.10.7",
     "canvas": "^2.11.2"
   }
 }
