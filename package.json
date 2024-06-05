@@ -5,7 +5,8 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./main.js"
   },
   "keywords": [
     "game",
@@ -15,7 +16,11 @@
   "author": "DarkSystem",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@kmamal/gl": "^8.0.2-6",
     "@kmamal/sdl": "^0.10.7",
-    "canvas": "^2.11.2"
+    "canvas": "^2.11.2",
+    "get-pixels": "^3.3.3",
+    "ndarray": "^1.0.19",
+    "ndarray-pack": "^1.2.1"
   }
 }

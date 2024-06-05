@@ -3,8 +3,8 @@ import sdl from '@kmamal/sdl'
 const window = sdl.video.createWindow({ resizable: true })
 
 const redraw = () => {
-	const { pixelWidth: width, pixelHeight: height } = window
-	const stride = width * 4
+	var { pixelWidth: width, pixelHeight: height } = window
+	var stride = width * 4
 	const buffer = Buffer.alloc(stride * height)
 
 	let offset = 0
