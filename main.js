@@ -1,6 +1,6 @@
 import { GFX, PixelArray, Screen } from "./gfx.js";
 
-var screen = new Screen([320, 180], [1, 1], "Game");
+var screen = new Screen([640, 360], [1, 1], "Game");
 var square = new PixelArray(100, 100);
 const gfx = new GFX(screen);
 screen.registerEvent("mouse.move", (mouse) => {
