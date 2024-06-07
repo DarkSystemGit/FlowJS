@@ -9,5 +9,6 @@ screen.registerEvent("mouse.move", (mouse) => {
 for (var i = 0; i < 100; i++) {
   for (var j = 0; j < 100; j++) square.set(i, j, [255, 255, 255, 255]);
 }
+gfx.fillScreen([0,0,255,255])
 gfx.draw(0, 0, 0, square);
 gfx.draw(10, 5, -1, square);
