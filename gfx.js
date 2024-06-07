@@ -12,27 +12,42 @@ const processArr = (array, factor, shape) => {
       .flat(1)
   );
 };
+const mousePressed = () => {
+  for (var i = 0; i < 2; i++) {
+    if (
+      sdl.mouse.getButton(
+        [
+          sdl.mouse.BUTTON.LEFT,
+          sdl.mouse.BUTTON.RIGHT,
+          sdl.mouse.BUTTON.MIDDLE,
+        ][i]
+      )
+    )
+      return true;
+  }
+};
 export class GFX {
   constructor(screen) {
     this.ctx = screen.ctx;
     this.screen = screen;
   }
   /** Draw a PixelArray or Texture to the screen */
-  draw(x, y, z, pixels) {
+  draw(x, y, z, pixels, angle) {
     this.screen.draw(
       Canvas.createImageData(pixels._getData(), ...pixels.getShape()),
       x,
       y,
-      z
+      z,
+      pixels.getShape(),
+      angle
     );
   }
   /** Fills the screen with a color */
   fillScreen(color) {
-    this.screen._clear()
-    var fill=new PixelArray(...this.screen.dimensions)
+    this.screen._clear();
+    var fill = new PixelArray(...this.screen.dimensions);
     fill.fill(color || [0, 0, 0, 255]);
-    this.draw(0,0,-Infinity,fill)
-   
+    this.draw(0, 0, -Infinity, fill);
   }
   /** Update screen instance */
   updateScreen(screen) {
@@ -41,11 +56,11 @@ export class GFX {
 }
 export class PixelArray {
   constructor(w, h) {
-    this.obj = { data: Array(w*h*4), shape: [w, h, 4] };
+    this.obj = { data: Array(w * h * 4), shape: [w, h, 4] };
   }
   /** Fills the Array */
-  fill(color){
-    this.obj.data.fill(color)
+  fill(color) {
+    this.obj.data.fill(color);
   }
   /** Sets a pixel in the array */
   set(x, y, value) {
@@ -96,22 +111,34 @@ export class Screen {
     }, 16.7);
   }
   /** Draws an object to the screen */
-  draw(pixels, x, y, z) {
+  draw(pixels, x, y, z, shape, angle) {
     this.objects.set(z, this.objects.get(z) || []);
-    this.objects.get(z).push({ x, y, pixels });
+    this.objects.get(z).push({ x, y, pixels, shape, rotate: angle || 0 });
   }
   /** Internal method that actually draws to the screen */
   _drawObjects() {
     var zaxis = Array.from(this.objects.keys()).sort((a, b) => a - b);
     zaxis.forEach((z) =>
-      this.objects
-        .get(z)
-        .forEach((item) => this.ctx.putImageData(item.pixels, item.x, item.y))
+      this.objects.get(z).forEach((item) => {
+        console.log(item);
+        if (item.rotation) {
+          var c = [item.x + item.shape[0] / 2, item.y + item.shape[1] / 2];
+          this.ctx.translate(...c);
+          this.ctx.rotate(0.00872664625 * item.rotation);
+          var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
+          var tmpCtx = tmpCanvas.getContext("2d");
+          tmpCtx.putImageData(item.pixels, 0, 0);
+          this.ctx.drawImage(tmpCanvas, item.x, item.y);
+          this.ctx.translate(-1 * c[0], -1 * c[1]);
+        } else {
+          this.ctx.putImageData(item.pixels, item.x, item.y);
+        }
+      })
     );
   }
   /** Internal method to clear screen */
-  _clear(){
-    this.objects.clear()
+  _clear() {
+    this.objects.clear();
   }
   /** Implemented by subclass, runs on each frame*/
   onFrame() {}
@@ -128,13 +155,24 @@ export class Screen {
     this.mouse.push(sdl.mouse.position);
     var keys = sdl.keyboard.getState();
     Object.keys(events.keyboard).forEach((key) => {
-      if (keys[sdl.keyboard.SCANCODE[key]])
-        events.keyboard[key].forEach((f) => f(this));
+      if (
+        keys[sdl.keyboard.SCANCODE[key]] ||
+        (key == "*" && keys.includes(true))
+      )
+        events.keyboard[key].forEach((f) => f(key, this));
     });
     Object.keys(events.mouse).forEach((ev) => {
       if (
-        ["button.left", "button.right", "button.middle"].includes(ev) &&
-        sdl.mouse.getButton(sdl.mouse.BUTTON[ev.split(".")[1].toUpperCase()])
+        (["button.left", "button.right", "button.middle"].includes(ev) &&
+          sdl.mouse.getButton(
+            sdl.mouse.BUTTON[ev.split(".")[1].toUpperCase()]
+          )) ||
+        (ev == "*" &&
+          (mousePressed() ||
+            !util.isDeepStrictEqual(
+              this.mouse[this.mouse.length - 1],
+              this.mouse[this.mouse.length - 2]
+            )))
       ) {
         events.mouse[ev].forEach((f) => f(this));
       }
