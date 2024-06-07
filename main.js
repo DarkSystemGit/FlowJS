@@ -9,4 +9,4 @@ for (var i = 0; i < 100; i++) {
 }
 gfx.fillScreen([0,0,255,255])
 //gfx.draw(0, 0, 0, square);
-gfx.draw(0, -40, -1, square,90);
+gfx.draw(270, 130, -1, square,270);
