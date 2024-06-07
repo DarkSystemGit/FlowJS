@@ -113,14 +113,14 @@ export class Screen {
   /** Draws an object to the screen */
   draw(pixels, x, y, z, shape, angle) {
     this.objects.set(z, this.objects.get(z) || []);
-    this.objects.get(z).push({ x, y, pixels, shape, rotate: angle || 0 });
+    this.objects.get(z).push({ x, y, pixels, shape, rotation: angle || 0 });
   }
   /** Internal method that actually draws to the screen */
   _drawObjects() {
     var zaxis = Array.from(this.objects.keys()).sort((a, b) => a - b);
     zaxis.forEach((z) =>
       this.objects.get(z).forEach((item) => {
-        console.log(item);
+        //console.log(item);
         if (item.rotation) {
           var c = [item.x + item.shape[0] / 2, item.y + item.shape[1] / 2];
           this.ctx.translate(...c);
@@ -129,6 +129,7 @@ export class Screen {
           var tmpCtx = tmpCanvas.getContext("2d");
           tmpCtx.putImageData(item.pixels, 0, 0);
           this.ctx.drawImage(tmpCanvas, item.x, item.y);
+          this.ctx.rotate(-0.00872664625 * item.rotation);
           this.ctx.translate(-1 * c[0], -1 * c[1]);
         } else {
           this.ctx.putImageData(item.pixels, item.x, item.y);
