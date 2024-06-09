@@ -42,6 +42,14 @@ export class GFX {
       pixels.getAngle()
     );
   }
+  /** Moves a PixelArray or Texture around the screen*/
+  move(id,newPosition){
+    this.screen.changeObject(id,newPosition)
+  }
+  /** Changes an item's texture */
+  changeObjectTexture(id,texture){
+    this.screen.changeObject(id,{pixels:Canvas.createImageData(texture._getData(), ...texture.getShape())})
+  }
   /** Fills the screen with a color */
   fillScreen(color) {
     this.screen._clear();
@@ -116,13 +124,13 @@ export class Screen {
     }, 16.7);
   }
   /** Draws an object to the screen, returns a object id */
-  draw(pixels, x, y, z, shape, angle) {
-    var id = JSON.parse(JSON.stringify(this.uuid));
+  draw(pixels, x, y, z, shape, angle,oldid) {
+    var id = oldid||JSON.parse(JSON.stringify(this.uuid));
     this.objects.set(z, this.objects.get(z) || []);
     this.objects
       .get(z)
       .push({ x, y, z, pixels, shape, id, rotation: angle || 0 });
-    this.uuid++;
+    if(!oldid)this.uuid++;
     return id;
   }
   /** Changes an object */
@@ -143,7 +151,8 @@ export class Screen {
       item.y,
       item.z,
       item.shape,
-      item.rotation
+      item.rotation,
+      item.id
     );
   }
   /** Internal method that actually draws to the screen */
