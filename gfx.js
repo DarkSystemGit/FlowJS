@@ -32,14 +32,14 @@ export class GFX {
     this.screen = screen;
   }
   /** Draw a PixelArray or Texture to the screen */
-  draw(x, y, z, pixels, angle) {
+  draw(x, y, z, pixels) {
     this.screen.draw(
       Canvas.createImageData(pixels._getData(), ...pixels.getShape()),
       x,
       y,
       z,
       pixels.getShape(),
-      angle
+      pixels.getAngle()
     );
   }
   /** Fills the screen with a color */
@@ -77,6 +77,10 @@ export class PixelArray {
   getShape() {
     return this.obj.shape;
   }
+  /** Get the array's rotation angle */
+  getAngle() {
+    return 0;
+  }
 }
 export class Screen {
   constructor(dimensions, scale, title) {
@@ -91,8 +95,9 @@ export class Screen {
     this.canvas = Canvas.createCanvas(...dimensions);
     this.ctx = this.canvas.getContext("2d");
     this.scale = scale;
-    this.objects = new Map();
     this.dimensions = dimensions;
+    this.id=0;
+    this.objects = new Map();
     this.mouse = [];
     var gameLoop = setInterval(() => {
       if (window.destroyed) {
@@ -113,7 +118,8 @@ export class Screen {
   /** Draws an object to the screen */
   draw(pixels, x, y, z, shape, angle) {
     this.objects.set(z, this.objects.get(z) || []);
-    this.objects.get(z).push({ x, y, pixels, shape, rotation: angle || 0 });
+    this.objects.get(z).push({ x, y, pixels, shape, id:this.id++,rotation: angle || 0 });
+    return this.id
   }
   /** Internal method that actually draws to the screen */
   _drawObjects() {
@@ -122,15 +128,15 @@ export class Screen {
       this.objects.get(z).forEach((item) => {
         //console.log(item);
         if (item.rotation) {
-          var c = [item.x +( item.shape[0] ),( item.y /*+ item.shape[1] / 2*/)];
+          var c = [item.x + item.shape[0], item.y /*+ item.shape[1] / 2*/];
           this.ctx.translate(...c);
-          console.log(c)
-          this.ctx.rotate((Math.PI * item.rotation)/360);
+          console.log(c);
+          this.ctx.rotate((Math.PI * item.rotation) / 360);
           var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
           var tmpCtx = tmpCanvas.getContext("2d");
           tmpCtx.putImageData(item.pixels, 0, 0);
           this.ctx.drawImage(tmpCanvas, item.x, item.y);
-          this.ctx.rotate(-1*((Math.PI * item.rotation)/360));
+          this.ctx.rotate(-1 * ((Math.PI * item.rotation) / 360));
           this.ctx.translate(-1 * c[0], -1 * c[1]);
         } else {
           this.ctx.putImageData(item.pixels, item.x, item.y);

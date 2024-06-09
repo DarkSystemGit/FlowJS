@@ -7,4 +7,4 @@ screen.registerEvent("mouse.*", () => {});
 square.fill([255, 255, 255, 255]);
 gfx.fillScreen([0, 0, 255, 255]);
 //gfx.draw(0, 0, 0, square);
-gfx.draw(5, 50, -1, square, 90);
+console.log(gfx.draw(50, 50, -1, square, 90));
