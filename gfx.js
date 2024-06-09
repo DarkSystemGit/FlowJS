@@ -33,7 +33,7 @@ export class GFX {
   }
   /** Draw a PixelArray or Texture to the screen */
   draw(x, y, z, pixels) {
-    this.screen.draw(
+    return this.screen.draw(
       Canvas.createImageData(pixels._getData(), ...pixels.getShape()),
       x,
       y,
@@ -96,7 +96,7 @@ export class Screen {
     this.ctx = this.canvas.getContext("2d");
     this.scale = scale;
     this.dimensions = dimensions;
-    this.id=0;
+    this.uuid=0;
     this.objects = new Map();
     this.mouse = [];
     var gameLoop = setInterval(() => {
@@ -117,9 +117,11 @@ export class Screen {
   }
   /** Draws an object to the screen */
   draw(pixels, x, y, z, shape, angle) {
+    var id=JSON.parse(JSON.stringify(this.uuid))
     this.objects.set(z, this.objects.get(z) || []);
-    this.objects.get(z).push({ x, y, pixels, shape, id:this.id++,rotation: angle || 0 });
-    return this.id
+    this.objects.get(z).push({ x, y, pixels, shape, id,rotation: angle || 0 });
+    this.uuid++
+    return id
   }
   /** Internal method that actually draws to the screen */
   _drawObjects() {
