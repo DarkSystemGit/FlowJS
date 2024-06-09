@@ -122,14 +122,15 @@ export class Screen {
       this.objects.get(z).forEach((item) => {
         //console.log(item);
         if (item.rotation) {
-          var c = [item.x + item.shape[0] / 2, item.y + item.shape[1] / 2];
+          var c = [item.x +( item.shape[0] / 2),( item.y + item.shape[1] / 2)];
           this.ctx.translate(...c);
-          this.ctx.rotate(0.00872664625 * item.rotation);
+          console.log(c)
+          this.ctx.rotate((Math.PI * item.rotation)/180);
           var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
           var tmpCtx = tmpCanvas.getContext("2d");
           tmpCtx.putImageData(item.pixels, 0, 0);
           this.ctx.drawImage(tmpCanvas, item.x, item.y);
-          this.ctx.rotate(-0.00872664625 * item.rotation);
+          this.ctx.rotate(-1*((Math.PI * item.rotation)/180));
           this.ctx.translate(-1 * c[0], -1 * c[1]);
         } else {
           this.ctx.putImageData(item.pixels, item.x, item.y);

@@ -4,9 +4,7 @@ var screen = new Screen([1280, 720], [1, 1], "Game");
 var square = new PixelArray(100, 100);
 const gfx = new GFX(screen);
 screen.registerEvent("mouse.*", () => {});
-for (var i = 0; i < 100; i++) {
-  for (var j = 0; j < 100; j++) square.set(i, j, [255, 255, 255, 255]);
-}
-gfx.fillScreen([0,0,255,255])
+square.fill([255, 255, 255, 255]);
+gfx.fillScreen([0, 0, 255, 255]);
 //gfx.draw(0, 0, 0, square);
-gfx.draw(270, 130, -1, square,90);
+gfx.draw(0, 0, -1, square, 90);
