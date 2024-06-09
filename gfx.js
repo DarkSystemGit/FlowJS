@@ -96,7 +96,7 @@ export class Screen {
     this.ctx = this.canvas.getContext("2d");
     this.scale = scale;
     this.dimensions = dimensions;
-    this.uuid=0;
+    this.uuid = 0;
     this.objects = new Map();
     this.mouse = [];
     var gameLoop = setInterval(() => {
@@ -115,13 +115,36 @@ export class Screen {
       );
     }, 16.7);
   }
-  /** Draws an object to the screen */
+  /** Draws an object to the screen, returns a object id */
   draw(pixels, x, y, z, shape, angle) {
-    var id=JSON.parse(JSON.stringify(this.uuid))
+    var id = JSON.parse(JSON.stringify(this.uuid));
     this.objects.set(z, this.objects.get(z) || []);
-    this.objects.get(z).push({ x, y, pixels, shape, id,rotation: angle || 0 });
-    this.uuid++
-    return id
+    this.objects
+      .get(z)
+      .push({ x, y, z, pixels, shape, id, rotation: angle || 0 });
+    this.uuid++;
+    return id;
+  }
+  /** Changes an object */
+  changeObject(id, newObj) {
+    var item;
+    Array.from(this.objects.values()).forEach((z) =>
+      z.forEach((i, c) => {
+        if (i.id == id) {
+          item = i;
+          delete z[c];
+        }
+      })
+    );
+    Object.keys(newObj).forEach((k) => (item[k] = newObj[k]));
+    this.draw(
+      item.pixels,
+      item.x,
+      item.y,
+      item.z,
+      item.shape,
+      item.rotation
+    );
   }
   /** Internal method that actually draws to the screen */
   _drawObjects() {
