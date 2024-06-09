@@ -122,7 +122,7 @@ export class Screen {
       this.objects.get(z).forEach((item) => {
         //console.log(item);
         if (item.rotation) {
-          var c = [item.x /*+( item.shape[0] / 2)*/,( item.y /*+ item.shape[1] / 2*/)];
+          var c = [item.x +( item.shape[0] ),( item.y /*+ item.shape[1] / 2*/)];
           this.ctx.translate(...c);
           console.log(c)
           this.ctx.rotate((Math.PI * item.rotation)/360);
