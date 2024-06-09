@@ -130,7 +130,6 @@ export class Screen {
         if (item.rotation) {
           var c = [item.x + item.shape[0], item.y /*+ item.shape[1] / 2*/];
           this.ctx.translate(...c);
-          console.log(c);
           this.ctx.rotate((Math.PI * item.rotation) / 360);
           var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
           var tmpCtx = tmpCanvas.getContext("2d");
