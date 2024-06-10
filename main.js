@@ -9,4 +9,4 @@ gfx.fillScreen([0, 0, 255, 255]);
 gfx.draw(0, 0, 0, square);
 var drawnSquare=gfx.draw(50, 50, -1, square);
 //gfx.moveObject(drawnSquare,{y:100,x:100})
-gfx.rotateObject(drawnSquare,270)
+gfx.rotateObject(drawnSquare,360)

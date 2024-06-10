@@ -170,16 +170,17 @@ export class Screen {
     zaxis.forEach((z) =>
       this.objects.get(z).forEach((item) => {
         if (item.rotation) {
-          var c = [item.x /*+ item.shape[0]*/, item.y + item.shape[1]];
-          console.log(c);
+          var c = [item.x + item.shape[0]/2, item.y + item.shape[1]/2];
+          this.ctx.save()
           this.ctx.translate(...c);
           this.ctx.rotate((Math.PI * item.rotation) / 360);
           var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
           var tmpCtx = tmpCanvas.getContext("2d");
           tmpCtx.putImageData(item.pixels, 0, 0);
-          this.ctx.drawImage(tmpCanvas, item.x, item.y);
-          this.ctx.rotate(-1 * ((Math.PI * item.rotation) / 360));
-          this.ctx.translate(-1 * c[0], -1 * c[1]);
+          this.ctx.drawImage(tmpCanvas, -item.shape[0]/2, -item.shape[1]/2);
+          //this.ctx.rotate(-1 * ((Math.PI * item.rotation) / 360));
+          //this.ctx.translate(-1 * c[0], -1 * c[1]);
+          this.ctx.restore()
         } else {
           this.ctx.putImageData(item.pixels, item.x, item.y);
         }
