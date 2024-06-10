@@ -2,15 +2,7 @@ import Canvas from "canvas";
 import sdl from "@kmamal/sdl";
 import util from "util";
 const processArr = (array, factor, shape) => {
-  return (
-    array
-      /*.map((r) => {
-      return Array(Math.ceil(factor[0])).fill(
-        r.flatMap((i) => Array(Math.ceil(factor[1])).fill(i))
-      );
-    })*/
-      .flat(1)
-  );
+  return array.flat(1);
 };
 const mousePressed = () => {
   for (var i = 0; i < 2; i++) {
@@ -43,12 +35,18 @@ export class GFX {
     );
   }
   /** Moves a PixelArray or Texture around the screen*/
-  move(id,newPosition){
-    this.screen.changeObject(id,newPosition)
+  moveObject(id, newPosition) {
+    this.screen.changeObject(id, newPosition);
   }
   /** Changes an item's texture */
-  changeObjectTexture(id,texture){
-    this.screen.changeObject(id,{pixels:Canvas.createImageData(texture._getData(), ...texture.getShape())})
+  changeObjectTexture(id, texture) {
+    this.screen.changeObject(id, {
+      pixels: Canvas.createImageData(texture._getData(), ...texture.getShape()),
+    });
+  }
+  /** Rotates a object */
+  rotateObject(id, degrees) {
+    this.screen.changeObject(id, { rotation: degrees });
   }
   /** Fills the screen with a color */
   fillScreen(color) {
@@ -90,6 +88,17 @@ export class PixelArray {
     return 0;
   }
 }
+export class Texture extends PixelArray {
+  constructor(...args) {
+    super(...args);
+  }
+  rotate(degrees) {
+    this.rotation = degrees;
+  }
+  getAngle() {
+    return this.rotation;
+  }
+}
 export class Screen {
   constructor(dimensions, scale, title) {
     const window = (this.window = sdl.video.createWindow({
@@ -124,13 +133,13 @@ export class Screen {
     }, 16.7);
   }
   /** Draws an object to the screen, returns a object id */
-  draw(pixels, x, y, z, shape, angle,oldid) {
-    var id = oldid||JSON.parse(JSON.stringify(this.uuid));
+  draw(pixels, x, y, z, shape, angle, oldid) {
+    var id = oldid || JSON.parse(JSON.stringify(this.uuid));
     this.objects.set(z, this.objects.get(z) || []);
     this.objects
       .get(z)
       .push({ x, y, z, pixels, shape, id, rotation: angle || 0 });
-    if(!oldid)this.uuid++;
+    if (!oldid) this.uuid++;
     return id;
   }
   /** Changes an object */
@@ -160,9 +169,9 @@ export class Screen {
     var zaxis = Array.from(this.objects.keys()).sort((a, b) => a - b);
     zaxis.forEach((z) =>
       this.objects.get(z).forEach((item) => {
-        //console.log(item);
         if (item.rotation) {
-          var c = [item.x + item.shape[0], item.y /*+ item.shape[1] / 2*/];
+          var c = [item.x /*+ item.shape[0]*/, item.y + item.shape[1]];
+          console.log(c);
           this.ctx.translate(...c);
           this.ctx.rotate((Math.PI * item.rotation) / 360);
           var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
