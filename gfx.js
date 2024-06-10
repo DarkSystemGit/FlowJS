@@ -1,7 +1,7 @@
 import Canvas from "canvas";
 import sdl from "@kmamal/sdl";
 import util from "util";
-const processArr = (array, factor, shape) => {
+const processArr = (array) => {
   return array.flat(1);
 };
 const mousePressed = () => {
@@ -188,7 +188,7 @@ export class Screen {
   _clear() {
     this.objects.clear();
   }
-  /** Implemented by subclass, runs on each frame*/
+  /** Implemented by engine subclass, runs on each frame*/
   onFrame() {}
   /** Registers a event with the engine */
   registerEvent(event, handler) {
