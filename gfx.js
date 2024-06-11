@@ -4,6 +4,10 @@ import util from "util";
 const processArr = (array) => {
   return array.flat(1);
 };
+const getMethods = (obj) => {
+  console.log(Object.keys(obj))
+  return Object.keys(obj).filter((i)=>typeof obj[i]=='function');
+};
 const mousePressed = () => {
   for (var i = 0; i < 2; i++) {
     if (
@@ -18,7 +22,7 @@ const mousePressed = () => {
       return true;
   }
 };
-export class GFX {
+class GFX {
   constructor(screen) {
     this.ctx = screen.ctx;
     this.screen = screen;
@@ -99,8 +103,8 @@ export class Texture extends PixelArray {
     return this.rotation;
   }
 }
-export class Screen {
-  constructor(dimensions, scale, title) {
+export class Engine {
+  constructor(handlerClass,dimensions, scale, title) {
     const window = (this.window = sdl.video.createWindow({
       resizable: false,
       accelerated: true,
@@ -116,13 +120,15 @@ export class Screen {
     this.uuid = 0;
     this.objects = new Map();
     this.mouse = [];
+    var handler=new handlerClass(new GFX(this))
+    this.onFrame=()=>handler.onFrame()||function(){}
     var gameLoop = setInterval(() => {
       if (window.destroyed) {
         clearInterval(gameLoop);
         return;
       }
       this._handleEvents();
-      this.onFrame();
+      this.onFrame(this);
       this._drawObjects();
       window.render(
         ...this.dimensions,
@@ -170,14 +176,17 @@ export class Screen {
     zaxis.forEach((z) =>
       this.objects.get(z).forEach((item) => {
         if (item.rotation) {
-          this.ctx.save()
-          this.ctx.translate(item.x + item.shape[0]/2, item.y + item.shape[1]/2);
+          this.ctx.save();
+          this.ctx.translate(
+            item.x + item.shape[0] / 2,
+            item.y + item.shape[1] / 2
+          );
           this.ctx.rotate((Math.PI * item.rotation) / 360);
           var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
           var tmpCtx = tmpCanvas.getContext("2d");
           tmpCtx.putImageData(item.pixels, 0, 0);
-          this.ctx.drawImage(tmpCanvas, -item.shape[0]/2, -item.shape[1]/2);
-          this.ctx.restore()
+          this.ctx.drawImage(tmpCanvas, -item.shape[0] / 2, -item.shape[1] / 2);
+          this.ctx.restore();
         } else {
           this.ctx.putImageData(item.pixels, item.x, item.y);
         }
@@ -188,10 +197,8 @@ export class Screen {
   _clear() {
     this.objects.clear();
   }
-  /** Implemented by engine subclass, runs on each frame*/
-  onFrame() {}
-  /** Registers a event with the engine */
-  registerEvent(event, handler) {
+  /** Internal method that registers a event with the engine */
+  _registerEvent(event, handler) {
     this.events[event.split(".")[0]] = this.events[event.split(".")[0]] || {};
     this.events[event.split(".")[0]][event.split(".")[1]] =
       this.events[event.split(".")[0]][event.split(".")[1]] || [];
@@ -240,3 +247,4 @@ export class Screen {
     });
   }
 }
+
