@@ -17,8 +17,8 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@kmamal/sdl": "^0.10.7",
+    "@unpic/pixels": "^1.2.2",
     "canvas": "^2.11.2",
-    "get-pixels": "^3.3.3",
     "ndarray": "^1.0.19",
     "ndarray-pack": "^1.2.1",
     "ndarray-unpack": "^1.0.0"

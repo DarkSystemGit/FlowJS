@@ -4,10 +4,9 @@ import util from "util";
 import ndarray from "ndarray";
 import unpack from "ndarray-unpack";
 import pack from "ndarray-pack";
-import getPixelsImpl from "get-pixels";
-import path from "path";
+import { getPixels as getPixelsImpl } from "@unpic/pixels";
 import { readFile } from "node:fs/promises";
-function createImageBitmap(pix,w,h) {
+function createImageBitmap(pix, w, h) {
   var tmpCanvas = Canvas.createCanvas(w, h);
   tmpCanvas.getContext("2d").putImageData(pix, 0, 0);
   return tmpCanvas;
@@ -15,12 +14,13 @@ function createImageBitmap(pix,w,h) {
 const processArr = (array) => {
   return array.flat(1);
 };
-const getPixels = (...args) => {
-  return new Promise((resolve, reject) => {
-    getPixelsImpl(...args, (e, p) => {
-      !e ? resolve(p) : reject(e);
-    });
-  });
+const getPixels = async (file) => {
+  var pix = await getPixelsImpl(file);
+  console.log(file,pix)
+  return {
+    shape: [pix.width, pix.height],
+    data: Uint8ClampedArray.from(pix.data),
+  };
 };
 const mousePressed = () => {
   for (var i = 0; i < 2; i++) {
@@ -215,7 +215,7 @@ export class Engine {
     var zaxis = Array.from(this.objects.keys()).sort((a, b) => a - b);
     for (var z of zaxis) {
       for (var item of this.objects.get(z)) {
-        if(!item)continue;
+        if (!item) continue;
         if (item.rotation) {
           this.ctx.save();
           this.ctx.translate(
@@ -229,7 +229,11 @@ export class Engine {
           this.ctx.drawImage(tmpCanvas, -item.shape[0] / 2, -item.shape[1] / 2);
           this.ctx.restore();
         } else {
-          this.ctx.drawImage(createImageBitmap(item.pixels,...item.shape), item.x, item.y);
+          this.ctx.drawImage(
+            createImageBitmap(item.pixels, ...item.shape),
+            item.x,
+            item.y
+          );
         }
       }
     }
@@ -325,10 +329,8 @@ export class AssetManager {
     this.assets = {};
   }
   async loadTexture(filePath, name) {
-    var f = await getPixels(
-      await readFile(filePath),
-      `image/${path.extname(filePath).replace(".", "")}`
-    );
+    var f = await getPixels(await readFile(filePath));
+    console.log(f)
     f = new DimensionalArray(f, ...f.shape);
     this.assets[name] = f;
     return this.assets[name];
