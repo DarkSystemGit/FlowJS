@@ -1,25 +1,28 @@
-import sdl from '@kmamal/sdl'
+import { Texture, Engine } from "./gfx.js";
+import path from "path";
+import { cwd } from "node:process";
+var start;
+var frame = 0;
+class Game {
+  constructor(gfx, engine) {
+    this.gfx = gfx;
 
-const window = sdl.video.createWindow({ resizable: true })
-
-const redraw = () => {
-	var { pixelWidth: width, pixelHeight: height } = window
-	var stride = width * 4
-	const buffer = Buffer.alloc(stride * height)
-
-	let offset = 0
-	for (let i = 0; i < height; i++) {
-		for (let j = 0; j < width; j++) {
-			buffer[offset++] = Math.floor(256 * i / height) // R
-			buffer[offset++] = Math.floor(256 * j / width)  // G
-			buffer[offset++] = 0                            // B
-			buffer[offset++] = 255                          // A
-		}
-	}
-
-	window.render(width, height, stride, 'rgba32', buffer)
+    var square = new Texture(100, 100);
+    square.fill([255, 255, 255, 255]);
+    gfx.fillScreen([0, 0, 255, 255]);
+    gfx.draw(0, 0, 0, square);
+    this.drawnSquare = gfx.draw(50, 50, -1, square);
+  }
+  async onCreate(engine) {
+    await engine.loadAsset(path.join(cwd(), "test.png"), "mario");
+    this.gfx.draw(0, 0, 1, engine.convertAssetToTexture("mario"));
+  }
+  onFrame(engine) {
+    var obj = this.gfx.getObject(this.drawnSquare);
+    this.gfx.moveObject(this.drawnSquare, {
+      x: obj.x + (obj.x % 3),
+      y: obj.y + (obj.y % 3),
+    });
+  }
 }
-
-window
-	.on('resize', redraw)
-	.on('expose', redraw)
+new Engine(Game, [1280, 720], [1, 1], "Game");

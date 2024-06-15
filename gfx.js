@@ -10,10 +10,6 @@ import { readFile } from "node:fs/promises";
 const processArr = (array) => {
   return array.flat(1);
 };
-const getMethods = (obj) => {
-  console.log(Object.keys(obj));
-  return Object.keys(obj).filter((i) => typeof obj[i] == "function");
-};
 const getPixels = (...args) => {
   return new Promise((resolve, reject) => {
     getPixelsImpl(...args, (e, p) => {
@@ -56,9 +52,9 @@ class GFX {
     this.screen.changeObject(id, newPosition);
   }
   /** Gets an objects data */
-  getObject(id){
-    var obj=this.screen._getObject(id)
-    return {x:obj.x,y:obj.y,z:obj.z,angle:obj.rotation}
+  getObject(id) {
+    var obj = this.screen._getObject(id);
+    return { x: obj.x, y: obj.y, z: obj.z, angle: obj.rotation };
   }
   /** Changes an item's texture */
   changeObjectTexture(id, texture) {
@@ -83,7 +79,7 @@ class GFX {
   }
 }
 export class PixelArray {
-  constructor(w, h, data) {
+  constructor(w, h, c, data) {
     this.obj = { data: data || Array(w * h * 4), shape: [w, h, 4] };
   }
   /** Fills the Array */
@@ -112,6 +108,7 @@ export class PixelArray {
 }
 export class Texture extends PixelArray {
   constructor(...args) {
+    //console.log(args)
     super(...args);
   }
   rotate(degrees) {
@@ -123,39 +120,59 @@ export class Texture extends PixelArray {
 }
 export class Engine {
   constructor(handlerClass, dimensions, scale, title) {
-    const window = (this.window = sdl.video.createWindow({
-      resizable: false,
-      accelerated: true,
-      title,
-      width: dimensions[0],
-      height: dimensions[1],
-    }));
-    this.events = { keyboard: {}, mouse: {} };
-    this.canvas = Canvas.createCanvas(...dimensions);
-    this.ctx = this.canvas.getContext("2d");
-    this.scale = scale;
-    this.dimensions = dimensions;
-    this.uuid = 0;
-    this.objects = new Map();
-    this.mouse = [];
-    this.assets=new AssetManager()
-    var handler = new handlerClass(new GFX(this));
-    this.onFrame = () => handler.onFrame() || function () {};
-    var gameLoop = setInterval(() => {
-      if (window.destroyed) {
-        clearInterval(gameLoop);
-        return;
-      }
-      this._handleEvents();
-      this.onFrame(this);
-      this._drawObjects();
-      window.render(
-        ...this.dimensions,
-        this.dimensions[0] * 4,
-        "bgra32",
-        this.canvas.toBuffer("raw")
-      );
-    }, 16.7);
+    return (async () => {
+      const window = (this.window = sdl.video.createWindow({
+        resizable: false,
+        accelerated: true,
+        title,
+        width: dimensions[0],
+        height: dimensions[1],
+      }));
+      this.events = { keyboard: {}, mouse: {} };
+      this.canvas = Canvas.createCanvas(...dimensions);
+      this.ctx = this.canvas.getContext("2d");
+      this.scale = scale;
+      this.dimensions = dimensions;
+      this.uuid = 0;
+      this.objects = new Map();
+      this.mouse = [];
+      this.assets = new AssetManager();
+      var handler = new handlerClass(new GFX(this), this);
+      this.onFrame = (a) => handler.onFrame(a) || function () {};
+      await handler.onCreate(this);
+      var gameLoop = setInterval(() => {
+        if (window.destroyed) {
+          clearInterval(gameLoop);
+          return;
+        }
+        this._handleEvents();
+        this.onFrame(this);
+        this._drawObjects();
+        window.render(
+          ...this.dimensions,
+          this.dimensions[0] * 4,
+          "bgra32",
+          this.canvas.toBuffer("raw")
+        );
+      }, 16.7);
+      return this;
+    })();
+  }
+  /** Loads an asset */
+  async loadAsset(path, name) {
+    await this.assets.loadTexture(path, name);
+  }
+  /** Lists assets */
+  listAssets() {
+    return this.assets.listTextures();
+  }
+  /** Removes an asset */
+  removeAsset(name) {
+    this.assets.removeTexture(name);
+  }
+  /** Converts a loaded asset to a texture */
+  convertAssetToTexture(name) {
+    return this.assets.getTexture(name);
   }
   /** Draws an object to the screen, returns a object id */
   draw(pixels, x, y, z, shape, angle, oldid) {
@@ -222,7 +239,7 @@ export class Engine {
         }
       })
     );
-    return item
+    return item;
   }
   /** Internal method to clear screen */
   _clear() {
@@ -302,13 +319,14 @@ export class AssetManager {
   constructor() {
     this.assets = {};
   }
-  async loadTexture(filePath) {
+  async loadTexture(filePath, name) {
     var f = await getPixels(
       await readFile(filePath),
-      `image/${path.extname(filePath)}`
+      `image/${path.extname(filePath).replace(".", "")}`
     );
-    f = new DimensionalArray(f.data, ...f.shape);
-    this.assets[path.basename(filePath, path.extname(filePath))] = f;
+    f = new DimensionalArray(f, ...f.shape);
+    this.assets[name] = f;
+    return this.assets[name];
   }
   removeTexture(name) {
     delete this.assets[name];
