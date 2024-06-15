@@ -8,14 +8,16 @@ class Game {
     this.gfx = gfx;
 
     var square = new Texture(100, 100);
-    square.fill([255, 255, 255, 255]);
+    square.fill([255, 255, 255, 90]);
     gfx.fillScreen([0, 0, 255, 255]);
     gfx.draw(0, 0, 0, square);
     this.drawnSquare = gfx.draw(50, 50, -1, square);
   }
   async onCreate(engine) {
     await engine.loadAsset(path.join(cwd(), "test.png"), "mario");
-    this.gfx.draw(0, 0, 1, engine.convertAssetToTexture("mario"));
+    var mario=engine.convertAssetToTexture("mario")
+    //console.log(mario)
+    this.gfx.draw(0, 0, 1, mario);
   }
   onFrame(engine) {
     var obj = this.gfx.getObject(this.drawnSquare);

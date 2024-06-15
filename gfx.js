@@ -7,6 +7,11 @@ import pack from "ndarray-pack";
 import getPixelsImpl from "get-pixels";
 import path from "path";
 import { readFile } from "node:fs/promises";
+function createImageBitmap(pix,w,h) {
+  var tmpCanvas = Canvas.createCanvas(w, h);
+  tmpCanvas.getContext("2d").putImageData(pix, 0, 0);
+  return tmpCanvas;
+}
 const processArr = (array) => {
   return array.flat(1);
 };
@@ -108,7 +113,6 @@ export class PixelArray {
 }
 export class Texture extends PixelArray {
   constructor(...args) {
-    //console.log(args)
     super(...args);
   }
   rotate(degrees) {
@@ -140,14 +144,14 @@ export class Engine {
       var handler = new handlerClass(new GFX(this), this);
       this.onFrame = (a) => handler.onFrame(a) || function () {};
       await handler.onCreate(this);
-      var gameLoop = setInterval(() => {
+      var gameLoop = setInterval(async () => {
         if (window.destroyed) {
           clearInterval(gameLoop);
           return;
         }
         this._handleEvents();
         this.onFrame(this);
-        this._drawObjects();
+        await this._drawObjects();
         window.render(
           ...this.dimensions,
           this.dimensions[0] * 4,
@@ -207,10 +211,11 @@ export class Engine {
     );
   }
   /** Internal method that actually draws to the screen */
-  _drawObjects() {
+  async _drawObjects() {
     var zaxis = Array.from(this.objects.keys()).sort((a, b) => a - b);
-    zaxis.forEach((z) =>
-      this.objects.get(z).forEach((item) => {
+    for (var z of zaxis) {
+      for (var item of this.objects.get(z)) {
+        if(!item)continue;
         if (item.rotation) {
           this.ctx.save();
           this.ctx.translate(
@@ -224,10 +229,10 @@ export class Engine {
           this.ctx.drawImage(tmpCanvas, -item.shape[0] / 2, -item.shape[1] / 2);
           this.ctx.restore();
         } else {
-          this.ctx.putImageData(item.pixels, item.x, item.y);
+          this.ctx.drawImage(createImageBitmap(item.pixels,...item.shape), item.x, item.y);
         }
-      })
-    );
+      }
+    }
   }
   /** internal method to get Object */
   _getObject(id) {
