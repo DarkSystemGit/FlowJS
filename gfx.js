@@ -1,12 +1,25 @@
 import Canvas from "canvas";
 import sdl from "@kmamal/sdl";
 import util from "util";
+import ndarray from "ndarray";
+import unpack from "ndarray-unpack";
+import pack from "ndarray-pack";
+import getPixelsImpl from "get-pixels";
+import path from "path";
+import { readFile } from "node:fs/promises";
 const processArr = (array) => {
   return array.flat(1);
 };
 const getMethods = (obj) => {
-  console.log(Object.keys(obj))
-  return Object.keys(obj).filter((i)=>typeof obj[i]=='function');
+  console.log(Object.keys(obj));
+  return Object.keys(obj).filter((i) => typeof obj[i] == "function");
+};
+const getPixels = (...args) => {
+  return new Promise((resolve, reject) => {
+    getPixelsImpl(...args, (e, p) => {
+      !e ? resolve(p) : reject(e);
+    });
+  });
 };
 const mousePressed = () => {
   for (var i = 0; i < 2; i++) {
@@ -42,6 +55,11 @@ class GFX {
   moveObject(id, newPosition) {
     this.screen.changeObject(id, newPosition);
   }
+  /** Gets an objects data */
+  getObject(id){
+    var obj=this.screen._getObject(id)
+    return {x:obj.x,y:obj.y,z:obj.z,angle:obj.rotation}
+  }
   /** Changes an item's texture */
   changeObjectTexture(id, texture) {
     this.screen.changeObject(id, {
@@ -65,8 +83,8 @@ class GFX {
   }
 }
 export class PixelArray {
-  constructor(w, h) {
-    this.obj = { data: Array(w * h * 4), shape: [w, h, 4] };
+  constructor(w, h, data) {
+    this.obj = { data: data || Array(w * h * 4), shape: [w, h, 4] };
   }
   /** Fills the Array */
   fill(color) {
@@ -104,7 +122,7 @@ export class Texture extends PixelArray {
   }
 }
 export class Engine {
-  constructor(handlerClass,dimensions, scale, title) {
+  constructor(handlerClass, dimensions, scale, title) {
     const window = (this.window = sdl.video.createWindow({
       resizable: false,
       accelerated: true,
@@ -120,8 +138,9 @@ export class Engine {
     this.uuid = 0;
     this.objects = new Map();
     this.mouse = [];
-    var handler=new handlerClass(new GFX(this))
-    this.onFrame=()=>handler.onFrame()||function(){}
+    this.assets=new AssetManager()
+    var handler = new handlerClass(new GFX(this));
+    this.onFrame = () => handler.onFrame() || function () {};
     var gameLoop = setInterval(() => {
       if (window.destroyed) {
         clearInterval(gameLoop);
@@ -193,6 +212,18 @@ export class Engine {
       })
     );
   }
+  /** internal method to get Object */
+  _getObject(id) {
+    var item;
+    Array.from(this.objects.values()).forEach((z) =>
+      z.forEach((i, c) => {
+        if (i.id == id) {
+          item = i;
+        }
+      })
+    );
+    return item
+  }
   /** Internal method to clear screen */
   _clear() {
     this.objects.clear();
@@ -247,4 +278,48 @@ export class Engine {
     });
   }
 }
-
+export class DimensionalArray {
+  constructor(data, width, height, ...shape) {
+    this.data = ndarray(data.data, [width, height, shape].flat());
+  }
+  get(...pos) {
+    return this.data.get(...pos);
+  }
+  set(value, ...pos) {
+    return this.data.set(...pos, value);
+  }
+  getShape() {
+    return this.data.shape;
+  }
+  fromArray(arr) {
+    pack(arr, this.data);
+  }
+  toArray() {
+    return unpack(this.data);
+  }
+}
+export class AssetManager {
+  constructor() {
+    this.assets = {};
+  }
+  async loadTexture(filePath) {
+    var f = await getPixels(
+      await readFile(filePath),
+      `image/${path.extname(filePath)}`
+    );
+    f = new DimensionalArray(f.data, ...f.shape);
+    this.assets[path.basename(filePath, path.extname(filePath))] = f;
+  }
+  removeTexture(name) {
+    delete this.assets[name];
+  }
+  getTexture(name) {
+    return new Texture(
+      ...this.assets[name].getShape(),
+      this.assets[name].toArray()
+    );
+  }
+  listTextures() {
+    return Object.keys(this.assets);
+  }
+}
