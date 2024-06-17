@@ -4,7 +4,7 @@ import util from "util";
 import ndarray from "ndarray";
 import unpack from "ndarray-unpack";
 import pack from "ndarray-pack";
-import { getPixels as getPixelsImpl } from "@unpic/pixels";
+import { getFormat } from "@unpic/pixels";
 import { readFile } from "node:fs/promises";
 function createImageBitmap(pix, w, h) {
   var tmpCanvas = Canvas.createCanvas(w, h);
@@ -15,7 +15,10 @@ const processArr = (array) => {
   return array.flat(1);
 };
 const getPixels = async (file) => {
-  var pix = await getPixelsImpl(file);
+  var format=getFormat(file)
+  if (format=='png'){
+    
+  }
   return {
     shape: [pix.width, pix.height],
     data: Uint8ClampedArray.from(pix.data),
@@ -327,8 +330,9 @@ export class AssetManager {
   constructor() {
     this.assets = {};
   }
-  async loadTexture(filePath, name) {
-    var f = await getPixels(await readFile(filePath));
+  async loadTexture(file, name) {
+    file=await readFile(file)
+    var f = await getPixels(file);
     f = new DimensionalArray(f, ...f.shape);
     this.assets[name] = f;
     return this.assets[name];
