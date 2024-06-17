@@ -16,7 +16,6 @@ const processArr = (array) => {
 };
 const getPixels = async (file) => {
   var pix = await getPixelsImpl(file);
-  console.log(file,pix)
   return {
     shape: [pix.width, pix.height],
     data: Uint8ClampedArray.from(pix.data),
@@ -84,7 +83,7 @@ class GFX {
   }
 }
 export class PixelArray {
-  constructor(w, h, c, data) {
+  constructor(w, h, data) {
     this.obj = { data: data || Array(w * h * 4), shape: [w, h, 4] };
   }
   /** Fills the Array */
@@ -330,7 +329,6 @@ export class AssetManager {
   }
   async loadTexture(filePath, name) {
     var f = await getPixels(await readFile(filePath));
-    console.log(f)
     f = new DimensionalArray(f, ...f.shape);
     this.assets[name] = f;
     return this.assets[name];

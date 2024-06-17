@@ -16,7 +16,6 @@ class Game {
   async onCreate(engine) {
     await engine.loadAsset(path.join(cwd(), "test.png"), "mario");
     var mario=engine.convertAssetToTexture("mario")
-    //console.log(mario)
     this.gfx.draw(0, 0, 1, mario);
   }
   onFrame(engine) {
