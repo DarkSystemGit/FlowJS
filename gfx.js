@@ -5,7 +5,9 @@ import ndarray from "ndarray";
 import unpack from "ndarray-unpack";
 import pack from "ndarray-pack";
 import { getFormat } from "@unpic/pixels";
-import { readFile } from "node:fs/promises";
+import brc from 'fast-brc';
+import {PNG} from 'pngjs'
+import { readFile,writeFile } from "node:fs/promises";
 function createImageBitmap(pix, w, h) {
   var tmpCanvas = Canvas.createCanvas(w, h);
   tmpCanvas.getContext("2d").putImageData(pix, 0, 0);
@@ -17,8 +19,15 @@ const processArr = (array) => {
 const getPixels = async (file) => {
   var format=getFormat(file)
   if (format=='png'){
-    
+    var pix=PNG.sync.read(file)
+    //writeFile('pixels', Uint8ClampedArray.from(pix.data).toString())
   }
+  /*writeFile('pixels',brc({
+    numBands:1,
+    data: Array.from(pix.data),
+    //height: pix.height,
+    width: pix.width
+  }).data[0].flat().toString())*/
   return {
     shape: [pix.width, pix.height],
     data: Uint8ClampedArray.from(pix.data),
@@ -306,34 +315,13 @@ export class Engine {
     });
   }
 }
-export class DimensionalArray {
-  constructor(data, width, height, ...shape) {
-    this.data = ndarray(data.data, [width, height, shape].flat());
-  }
-  get(...pos) {
-    return this.data.get(...pos);
-  }
-  set(value, ...pos) {
-    return this.data.set(...pos, value);
-  }
-  getShape() {
-    return this.data.shape;
-  }
-  fromArray(arr) {
-    pack(arr, this.data);
-  }
-  toArray() {
-    return unpack(this.data);
-  }
-}
 export class AssetManager {
   constructor() {
     this.assets = {};
   }
   async loadTexture(file, name) {
     file=await readFile(file)
-    var f = await getPixels(file);
-    f = new DimensionalArray(f, ...f.shape);
+    var f = await getPixels(file)
     this.assets[name] = f;
     return this.assets[name];
   }
@@ -341,9 +329,15 @@ export class AssetManager {
     delete this.assets[name];
   }
   getTexture(name) {
+    
     return new Texture(
-      ...this.assets[name].getShape(),
-      this.assets[name].toArray()
+      ...this.assets[name].shape,
+      brc({
+        numBands:1,
+        data: Array.from(this.assets[name].data),
+        //height: this.assets[name].shape[1],
+        width: this.assets[name].shape[0]
+      }).data[0]
     );
   }
   listTextures() {
