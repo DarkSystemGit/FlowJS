@@ -68,19 +68,19 @@ class GFX {
     );
   }
   /**
-   *  Moves a PixelArray or Texture around the screen
-   * @param {Number} id
-   * @param {Object} newPosition
-   * @param {Number} newPosition.x
-   * @param {Number} newPosition.y
-   *  @param {number} newPosition.z
+   * Moves a Object around the screen
+   * @param {Number} id Object ID
+   * @param {Object} newPosition New Position
+   * @param {Number} newPosition.x X Cord
+   * @param {Number} newPosition.y Y Cord
+   *  @param {number} newPosition.z Z Cord
    */
   moveObject(id, newPosition) {
     this.screen.changeObject(id, newPosition);
   }
   /**
    * Gets an objects data
-   * @param {number} id
+   * @param {number} id Object ID
    * @returns {object}
    */
   getObject(id) {
@@ -88,9 +88,9 @@ class GFX {
     return { x: obj.x, y: obj.y, z: obj.z, angle: obj.rotation };
   }
   /**
-   * Changes an item's texture
-   * @param {number} id
-   * @param {Texture|PixelArray} texture
+   * Changes an object's texture
+   * @param {number} id Object ID
+   * @param {Texture|PixelArray} texture New Texture
    */
   changeObjectTexture(id, texture) {
     this.screen.changeObject(id, {
@@ -99,15 +99,15 @@ class GFX {
   }
   /**
    * Rotates a object
-   * @param {number} id 
-   * @param {number} degrees 
+   * @param {number} id Object ID
+   * @param {number} degrees Rotation Angle
    */
   rotateObject(id, degrees) {
     this.screen.changeObject(id, { rotation: degrees });
   }
   /**
    * Fills the screen with a color 
-   * @param {Array<number>} color 
+   * @param {Array<number>} color RGBA color
    */
   fillScreen(color) {
     this.screen._clear();
@@ -117,7 +117,7 @@ class GFX {
   }
   /**
    * Update screen instance
-   * @param {Screen} screen 
+   * @param {Screen} screen Screen object
    */
   updateScreen(screen) {
     this.screen = screen;
@@ -129,16 +129,16 @@ export class PixelArray {
   }
   /**
    * Fills the Array 
-   * @param {Array<number>} color 
+   * @param {Array<number>} color RGBA color
    */
   fill(color) {
     this.obj.data.fill(color);
   }
   /**
    * Sets a pixel in the array 
-   * @param {Number} x 
-   * @param {Number} y 
-   * @param {Array<Number>} value 
+   * @param {Number} x X cord
+   * @param {Number} y Y cord
+   * @param {Array<Number>} value RGBA color 
    */
   set(x, y, value) {
     this.obj.data[x * this.obj.shape[0] + y] = value;
@@ -170,7 +170,7 @@ export class Texture extends PixelArray {
   }
   /**
    * Rotates a Texture
-   * @param {Number} degrees 
+   * @param {Number} degrees Degrees to rotate
    */
   rotate(degrees) {
     this.rotation = degrees;
@@ -243,20 +243,30 @@ export class Engine {
   }
   /**
    * Removes an asset from storage
-   * @param {String} name 
+   * @param {String} name Name of asset
    */
   removeAsset(name) {
     this.assets.removeTexture(name);
   }
   /**
    * Converts a loaded asset to a texture
-   * @param {String} name 
+   * @param {String} name Name of asset
    * @returns {Texture}
    */
   convertAssetToTexture(name) {
     return this.assets.getTexture(name);
   }
-  /** Draws an object to the screen, returns a object id */
+  /**
+   * Draws an object to the screen, returns a object id 
+   * @param {ImageData} pixels Object's ImageData
+   * @param {Number} x X cord
+   * @param {Number} y Y cord
+   * @param {Number} z Z cord
+   * @param {Array<number>} shape Dimensions
+   * @param {Number} angle Rotation Angle
+   * @param {Number} oldid 
+   * @returns {Number} Object ID
+   */
   draw(pixels, x, y, z, shape, angle, oldid) {
     var id = oldid || JSON.parse(JSON.stringify(this.uuid));
     this.objects.set(z, this.objects.get(z) || []);
@@ -266,7 +276,11 @@ export class Engine {
     if (!oldid) this.uuid++;
     return id;
   }
-  /** Changes an object */
+  /**
+   *  Changes an object 
+   * @param {Number} id Object ID
+   * @param {Object} newObj Updated Properties
+   */
   changeObject(id, newObj) {
     var item;
     Array.from(this.objects.values()).forEach((z) =>
@@ -316,7 +330,11 @@ export class Engine {
       }
     }
   }
-  /** internal method to get Object */
+  /**
+   *  Internal method to get an Object 
+   * @param {Number} id Object ID
+   * @returns 
+   */
   _getObject(id) {
     var item;
     Array.from(this.objects.values()).forEach((z) =>
@@ -332,7 +350,11 @@ export class Engine {
   _clear() {
     this.objects.clear();
   }
-  /** Internal method that registers a event with the engine */
+  /**
+   *  Internal method that registers a event with the engine 
+   * @param {String} event 
+   * @param {Function} handler 
+   */
   _registerEvent(event, handler) {
     this.events[event.split(".")[0]] = this.events[event.split(".")[0]] || {};
     this.events[event.split(".")[0]][event.split(".")[1]] =
