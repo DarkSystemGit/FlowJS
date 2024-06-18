@@ -2,9 +2,9 @@ import Canvas from "canvas";
 import sdl from "@kmamal/sdl";
 import util from "util";
 import { getFormat } from "@unpic/pixels";
-import brc from 'fast-brc';
-import {PNG} from 'pngjs'
-import jpeg from 'jpeg-js'
+import brc from "fast-brc";
+import { PNG } from "pngjs";
+import jpeg from "jpeg-js";
 import { readFile } from "node:fs/promises";
 function createImageBitmap(pix, w, h) {
   var tmpCanvas = Canvas.createCanvas(w, h);
@@ -15,11 +15,11 @@ const processArr = (array) => {
   return array.flat(1);
 };
 const getPixels = async (file) => {
-  var format=getFormat(file)
-  if (format=='png'){
-    var pix=PNG.sync.read(file)
-  }else if(format=='jpg'){
-    var pix=jpeg.decode(file)
+  var format = getFormat(file);
+  if (format == "png") {
+    var pix = PNG.sync.read(file);
+  } else if (format == "jpg") {
+    var pix = jpeg.decode(file);
   }
   return {
     shape: [pix.width, pix.height],
@@ -41,11 +41,22 @@ const mousePressed = () => {
   }
 };
 class GFX {
+  /**
+   * Drawing interface
+   * @param {Screen} screen Screen object
+   */
   constructor(screen) {
     this.ctx = screen.ctx;
     this.screen = screen;
   }
-  /** Draw a PixelArray or Texture to the screen */
+  /**
+   * Draw a PixelArray or Texture to the screen
+   * @param {Number} x X cord
+   * @param {Number} y Y cord
+   * @param {Number} z Z cord
+   * @param {PixelArray|Texture} pixels PixelArray or Texture to draw
+   * @returns {Number}
+   */
   draw(x, y, z, pixels) {
     return this.screen.draw(
       Canvas.createImageData(pixels._getData(), ...pixels.getShape()),
@@ -56,33 +67,58 @@ class GFX {
       pixels.getAngle()
     );
   }
-  /** Moves a PixelArray or Texture around the screen*/
+  /**
+   *  Moves a PixelArray or Texture around the screen
+   * @param {Number} id
+   * @param {Object} newPosition
+   * @param {Number} newPosition.x
+   * @param {Number} newPosition.y
+   *  @param {number} newPosition.z
+   */
   moveObject(id, newPosition) {
     this.screen.changeObject(id, newPosition);
   }
-  /** Gets an objects data */
+  /**
+   * Gets an objects data
+   * @param {number} id
+   * @returns {object}
+   */
   getObject(id) {
     var obj = this.screen._getObject(id);
     return { x: obj.x, y: obj.y, z: obj.z, angle: obj.rotation };
   }
-  /** Changes an item's texture */
+  /**
+   * Changes an item's texture
+   * @param {number} id
+   * @param {Texture|PixelArray} texture
+   */
   changeObjectTexture(id, texture) {
     this.screen.changeObject(id, {
       pixels: Canvas.createImageData(texture._getData(), ...texture.getShape()),
     });
   }
-  /** Rotates a object */
+  /**
+   * Rotates a object
+   * @param {number} id 
+   * @param {number} degrees 
+   */
   rotateObject(id, degrees) {
     this.screen.changeObject(id, { rotation: degrees });
   }
-  /** Fills the screen with a color */
+  /**
+   * Fills the screen with a color 
+   * @param {Array<number>} color 
+   */
   fillScreen(color) {
     this.screen._clear();
     var fill = new PixelArray(...this.screen.dimensions);
     fill.fill(color || [0, 0, 0, 255]);
     this.draw(0, 0, -Infinity, fill);
   }
-  /** Update screen instance */
+  /**
+   * Update screen instance
+   * @param {Screen} screen 
+   */
   updateScreen(screen) {
     this.screen = screen;
   }
@@ -91,11 +127,19 @@ export class PixelArray {
   constructor(w, h, data) {
     this.obj = { data: data || Array(w * h * 4), shape: [w, h, 4] };
   }
-  /** Fills the Array */
+  /**
+   * Fills the Array 
+   * @param {Array<number>} color 
+   */
   fill(color) {
     this.obj.data.fill(color);
   }
-  /** Sets a pixel in the array */
+  /**
+   * Sets a pixel in the array 
+   * @param {Number} x 
+   * @param {Number} y 
+   * @param {Array<Number>} value 
+   */
   set(x, y, value) {
     this.obj.data[x * this.obj.shape[0] + y] = value;
   }
@@ -106,11 +150,16 @@ export class PixelArray {
     r.set(arr, 0);
     return r;
   }
-  /** Get the array's dimensions, [width, height] */
+  /**
+   * Get the array's dimensions
+   * @returns {Array<Number>}
+   */
   getShape() {
     return this.obj.shape;
   }
-  /** Get the array's rotation angle */
+  /** Get the array's rotation angle
+   * @returns {Number}
+   */
   getAngle() {
     return 0;
   }
@@ -119,6 +168,10 @@ export class Texture extends PixelArray {
   constructor(...args) {
     super(...args);
   }
+  /**
+   * Rotates a Texture
+   * @param {Number} degrees 
+   */
   rotate(degrees) {
     this.rotation = degrees;
   }
@@ -127,6 +180,14 @@ export class Texture extends PixelArray {
   }
 }
 export class Engine {
+  /**
+   * Game Engine
+   * @param {*} handlerClass Game class
+   * @param {*} dimensions Screen dimensions
+   * @param {*} scale Scale factor
+   * @param {*} title Window Title
+   * @returns 
+   */
   constructor(handlerClass, dimensions, scale, title) {
     return (async () => {
       const window = (this.window = sdl.video.createWindow({
@@ -166,19 +227,32 @@ export class Engine {
       return this;
     })();
   }
-  /** Loads an asset */
+  /**
+   * Loads an asset
+   * @param {String} path Path to file
+   * @param {String} name Name of asset
+   */
   async loadAsset(path, name) {
     await this.assets.loadTexture(path, name);
   }
-  /** Lists assets */
+  /** Lists loaded assets
+   * @returns {Array<String>}
+   */
   listAssets() {
     return this.assets.listTextures();
   }
-  /** Removes an asset */
+  /**
+   * Removes an asset from storage
+   * @param {String} name 
+   */
   removeAsset(name) {
     this.assets.removeTexture(name);
   }
-  /** Converts a loaded asset to a texture */
+  /**
+   * Converts a loaded asset to a texture
+   * @param {String} name 
+   * @returns {Texture}
+   */
   convertAssetToTexture(name) {
     return this.assets.getTexture(name);
   }
@@ -313,8 +387,8 @@ class AssetManager {
     this.assets = {};
   }
   async loadTexture(file, name) {
-    file=await readFile(file)
-    var f = await getPixels(file)
+    file = await readFile(file);
+    var f = await getPixels(file);
     this.assets[name] = f;
     return this.assets[name];
   }
@@ -322,14 +396,13 @@ class AssetManager {
     delete this.assets[name];
   }
   getTexture(name) {
-    
     return new Texture(
       ...this.assets[name].shape,
       brc({
-        numBands:1,
+        numBands: 1,
         data: Array.from(this.assets[name].data),
         //height: this.assets[name].shape[1],
-        width: this.assets[name].shape[0]
+        width: this.assets[name].shape[0],
       }).data[0]
     );
   }

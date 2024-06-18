@@ -2,7 +2,7 @@
   "name": "flowjs",
   "version": "1.0.0",
   "description": "A JS Game Engine",
-  "main": "main.js",
+  "main": "gfx.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
