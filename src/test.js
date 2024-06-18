@@ -1,5 +1,5 @@
 import { Texture, Engine } from "./main.js";
-import path from "path";
+import path from "node:path";
 import { cwd } from "node:process";
 class Game {
   constructor(gfx, engine) {

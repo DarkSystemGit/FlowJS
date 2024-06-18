@@ -1,10 +1,11 @@
 import Canvas from "canvas";
 import sdl from "@kmamal/sdl";
-import util from "util";
-import { getFormat } from "@unpic/pixels";
+import util from "node:util";
 import brc from "fast-brc";
-import { PNG } from "pngjs";
+import classMethods from "class-methods";
 import jpeg from "jpeg-js";
+import { getFormat } from "@unpic/pixels";
+import { PNG } from "pngjs";
 import { readFile } from "node:fs/promises";
 function createImageBitmap(pix, w, h) {
   var tmpCanvas = Canvas.createCanvas(w, h);
@@ -106,7 +107,7 @@ class GFX {
     this.screen.changeObject(id, { rotation: degrees });
   }
   /**
-   * Fills the screen with a color 
+   * Fills the screen with a color
    * @param {Array<number>} color RGBA color
    */
   fillScreen(color) {
@@ -128,17 +129,17 @@ export class PixelArray {
     this.obj = { data: data || Array(w * h * 4), shape: [w, h, 4] };
   }
   /**
-   * Fills the Array 
+   * Fills the Array
    * @param {Array<number>} color RGBA color
    */
   fill(color) {
     this.obj.data.fill(color);
   }
   /**
-   * Sets a pixel in the array 
+   * Sets a pixel in the array
    * @param {Number} x X cord
    * @param {Number} y Y cord
-   * @param {Array<Number>} value RGBA color 
+   * @param {Array<Number>} value RGBA color
    */
   set(x, y, value) {
     this.obj.data[x * this.obj.shape[0] + y] = value;
@@ -186,7 +187,7 @@ export class Engine {
    * @param {*} dimensions Screen dimensions
    * @param {*} scale Scale factor
    * @param {*} title Window Title
-   * @returns 
+   * @returns
    */
   constructor(handlerClass, dimensions, scale, title) {
     return (async () => {
@@ -207,6 +208,11 @@ export class Engine {
       this.mouse = [];
       this.assets = new AssetManager();
       var handler = new handlerClass(new GFX(this), this);
+      classMethods(handlerClass).forEach((method) => {
+        if (!["onCreate", "onFrame"].includes(method)) {
+          if(method=="onKeyPress")this._registerEvent('keyboard.*',handler.onKeyPress)
+        }
+      });
       this.onFrame = (a) => handler.onFrame(a) || function () {};
       await handler.onCreate(this);
       var gameLoop = setInterval(async () => {
@@ -257,14 +263,14 @@ export class Engine {
     return this.assets.getTexture(name);
   }
   /**
-   * Draws an object to the screen, returns a object id 
+   * Draws an object to the screen, returns a object id
    * @param {ImageData} pixels Object's ImageData
    * @param {Number} x X cord
    * @param {Number} y Y cord
    * @param {Number} z Z cord
    * @param {Array<number>} shape Dimensions
    * @param {Number} angle Rotation Angle
-   * @param {Number} oldid 
+   * @param {Number} oldid
    * @returns {Number} Object ID
    */
   draw(pixels, x, y, z, shape, angle, oldid) {
@@ -277,7 +283,7 @@ export class Engine {
     return id;
   }
   /**
-   *  Changes an object 
+   *  Changes an object
    * @param {Number} id Object ID
    * @param {Object} newObj Updated Properties
    */
@@ -331,9 +337,9 @@ export class Engine {
     }
   }
   /**
-   *  Internal method to get an Object 
+   *  Internal method to get an Object
    * @param {Number} id Object ID
-   * @returns 
+   * @returns
    */
   _getObject(id) {
     var item;
@@ -351,9 +357,9 @@ export class Engine {
     this.objects.clear();
   }
   /**
-   *  Internal method that registers a event with the engine 
-   * @param {String} event 
-   * @param {Function} handler 
+   *  Internal method that registers a event with the engine
+   * @param {String} event
+   * @param {Function} handler
    */
   _registerEvent(event, handler) {
     this.events[event.split(".")[0]] = this.events[event.split(".")[0]] || {};
@@ -431,7 +437,7 @@ class AssetManager {
   /**
    * Gets a texture
    * @param {String} name Asset Name
-   * @returns 
+   * @returns
    */
   getTexture(name) {
     return new Texture(
