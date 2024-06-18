@@ -405,18 +405,34 @@ export class Engine {
   }
 }
 class AssetManager {
+  /** Internal class to manage asssets */
   constructor() {
     this.assets = {};
   }
+  /**
+   * Loads a texture
+   * @param {String} file File Path
+   * @param {String} name Asset Name
+   * @returns {Object} Asset
+   */
   async loadTexture(file, name) {
     file = await readFile(file);
     var f = await getPixels(file);
     this.assets[name] = f;
     return this.assets[name];
   }
+  /**
+   * Deletes a texture from storage
+   * @param {String} name Asset Name
+   */
   removeTexture(name) {
     delete this.assets[name];
   }
+  /**
+   * Gets a texture
+   * @param {String} name Asset Name
+   * @returns 
+   */
   getTexture(name) {
     return new Texture(
       ...this.assets[name].shape,
@@ -428,6 +444,10 @@ class AssetManager {
       }).data[0]
     );
   }
+  /**
+   * List loaded assets
+   * @returns {Array<String>} Asset Names
+   */
   listTextures() {
     return Object.keys(this.assets);
   }
