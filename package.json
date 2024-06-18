@@ -5,8 +5,8 @@
   "main": "gfx.js",
   "type": "module",
   "scripts": {
-    "test": "node ./test.js",
-    "start": "node ./test.js"
+    "test": "node ./src/test.js",
+    "start": "node ./src/test.js"
   },
   "keywords": [
     "game",
@@ -22,5 +22,8 @@
     "fast-brc": "^0.0.1",
     "jpeg-js": "^0.4.4",
     "pngjs": "^7.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
   }
 }
