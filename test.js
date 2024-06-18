@@ -13,7 +13,7 @@ class Game {
     this.drawnSquare = gfx.draw(50, 50, -1, square);
   }
   async onCreate(engine) {
-    await engine.loadAsset(path.join(cwd(), "test.jpeg"), "mario");
+    await engine.loadAsset(path.join(cwd(), "test.png"), "mario");
     var mario=engine.convertAssetToTexture("mario")
     this.gfx.draw(0, 0, 1, mario);
   }
