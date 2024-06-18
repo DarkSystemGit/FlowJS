@@ -20,9 +20,7 @@
     "@unpic/pixels": "^1.2.2",
     "canvas": "^2.11.2",
     "fast-brc": "^0.0.1",
-    "ndarray": "^1.0.19",
-    "ndarray-pack": "^1.2.1",
-    "ndarray-unpack": "^1.0.0",
+    "jpeg-js": "^0.4.4",
     "pngjs": "^7.0.0"
   }
 }

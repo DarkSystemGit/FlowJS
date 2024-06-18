@@ -1,13 +1,11 @@
 import Canvas from "canvas";
 import sdl from "@kmamal/sdl";
 import util from "util";
-import ndarray from "ndarray";
-import unpack from "ndarray-unpack";
-import pack from "ndarray-pack";
 import { getFormat } from "@unpic/pixels";
 import brc from 'fast-brc';
 import {PNG} from 'pngjs'
-import { readFile,writeFile } from "node:fs/promises";
+import jpeg from 'jpeg-js'
+import { readFile } from "node:fs/promises";
 function createImageBitmap(pix, w, h) {
   var tmpCanvas = Canvas.createCanvas(w, h);
   tmpCanvas.getContext("2d").putImageData(pix, 0, 0);
@@ -20,14 +18,9 @@ const getPixels = async (file) => {
   var format=getFormat(file)
   if (format=='png'){
     var pix=PNG.sync.read(file)
-    //writeFile('pixels', Uint8ClampedArray.from(pix.data).toString())
+  }else if(format=='jpg'){
+    var pix=jpeg.decode(file)
   }
-  /*writeFile('pixels',brc({
-    numBands:1,
-    data: Array.from(pix.data),
-    //height: pix.height,
-    width: pix.width
-  }).data[0].flat().toString())*/
   return {
     shape: [pix.width, pix.height],
     data: Uint8ClampedArray.from(pix.data),
@@ -315,7 +308,7 @@ export class Engine {
     });
   }
 }
-export class AssetManager {
+class AssetManager {
   constructor() {
     this.assets = {};
   }
