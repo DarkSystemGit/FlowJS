@@ -11,15 +11,14 @@ class Game {
     this.drawnSquare = gfx.draw(50, 50, -1, square);
   }
   async onCreate(engine) {
-    await engine.loadAsset(path.join(cwd(), "test.png"), "mario");
-    var mario=engine.convertAssetToTexture("mario")
-    this.gfx.draw(0, 0, 1, mario);
+    await engine.loadAsset(path.join(cwd(), "src/test.png"), "mario");
+    this.mario=this.gfx.draw(0, 0, 1, engine.convertAssetToTexture("mario"));
   }
-  onFrame(engine) {
-    var obj = this.gfx.getObject(this.drawnSquare);
-    this.gfx.moveObject(this.drawnSquare, {
-      x: obj.x + (obj.x % 3),
-      y: obj.y + (obj.y % 3),
+  onFrame() {
+    var obj = this.gfx.getObject(this.mario);
+    this.gfx.moveObject(this.mario, {
+      x: obj.x +1,
+      y: obj.y +1,
     });
   }
 }
