@@ -21,5 +21,8 @@ class Game {
       y: obj.y +.5,
     });
   }
+  onKeyPress(k){
+    console.log(k) 
+  }
 }
 new Engine(Game, [1280, 720], [1, 1], "Game");

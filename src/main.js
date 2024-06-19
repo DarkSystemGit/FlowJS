@@ -12,6 +12,7 @@ function createImageBitmap(pix, w, h) {
   tmpCanvas.getContext("2d").putImageData(pix, 0, 0);
   return tmpCanvas;
 }
+
 const processArr = (array) => {
   return array.flat(1);
 };
@@ -41,6 +42,8 @@ const mousePressed = () => {
       return true;
   }
 };
+const indexesOf = (arr, item) =>
+  arr.reduce((acc, v, i) => (v === item && acc.push(i), acc), []);
 class GFX {
   /**
    * Drawing interface
@@ -183,10 +186,10 @@ export class Texture extends PixelArray {
 export class Engine {
   /**
    * Game Engine
-   * @param {*} handlerClass Game class
-   * @param {*} dimensions Screen dimensions
-   * @param {*} scale Scale factor
-   * @param {*} title Window Title
+   * @param {Class} handlerClass Game class
+   * @param {Array<number>} dimensions Screen dimensions
+   * @param {Number} scale Scale factor
+   * @param {String} title Window Title
    * @returns
    */
   constructor(handlerClass, dimensions, scale, title) {
@@ -206,16 +209,18 @@ export class Engine {
       this.uuid = 0;
       this.objects = new Map();
       this.mouse = [];
+      this.keyboard = [[0, 0]];
       this.assets = new AssetManager();
       var handler = new handlerClass(new GFX(this), this);
       classMethods(handlerClass).forEach((method) => {
         if (!["onCreate", "onFrame"].includes(method)) {
-          if(method=="onKeyPress")this._registerEvent('keyboard.*',handler.onKeyPress)
+          if (method == "onKeyPress")
+            this._registerEvent("keyboard.*", handler.onKeyPress);
         }
       });
       this.onFrame = (a) => handler.onFrame(a) || function () {};
       await handler.onCreate(this);
-      var loop=async () => {
+      var loop = async () => {
         if (window.destroyed) {
           return;
         }
@@ -228,8 +233,8 @@ export class Engine {
           "bgra32",
           this.canvas.toBuffer("raw")
         );
-        setTimeout(loop,0)
-      }
+        setTimeout(loop, 0);
+      };
       setTimeout(loop, 0);
       return this;
     })();
@@ -371,15 +376,34 @@ export class Engine {
   /** Internal method to handle events*/
   _handleEvents() {
     var events = this.events;
-    this.mouse.push(sdl.mouse.position);
     var keys = sdl.keyboard.getState();
-    Object.keys(events.keyboard).forEach((key) => {
-      if (
-        keys[sdl.keyboard.SCANCODE[key]] ||
-        (key == "*" && keys.includes(true))
-      )
-        events.keyboard[key].forEach((f) => f(key, this));
-    });
+    this.mouse.push(sdl.mouse.position);
+    if (!(indexesOf(keys, true).map((i) => sdl.keyboard.getKey(i)).length == 0))
+      this.keyboard.push([
+        indexesOf(keys, true).map((i) => sdl.keyboard.getKey(i)),
+        Date.now(),
+      ]);
+
+    if (
+      this.keyboard.length > 1 &&
+      this.keyboard[this.keyboard.length - 1][1] -
+        this.keyboard[this.keyboard.length - 2][1] >
+        20
+    ) {
+      Object.keys(events.keyboard).forEach((key) => {
+        if (
+          keys[sdl.keyboard.SCANCODE[sdl.keyboard.getScancode(key)]] ||
+          (key == "*" && keys.includes(true))
+        ) {
+          events.keyboard[key].forEach((f) => {
+            if (key == "*")
+              key = indexesOf(keys, true).map((i) => sdl.keyboard.getKey(i));
+            f(key, this);
+          });
+        }
+      });
+    }
+
     Object.keys(events.mouse).forEach((ev) => {
       if (
         (["button.left", "button.right", "button.middle"].includes(ev) &&
