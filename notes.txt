@@ -1,0 +1,6 @@
+Engine avg runtime:15.165416802521465ms
+User time allocated: 10ms
+Total allowable frame time:25.17ms
+Min FPS:39.73
+Max FPS:61.84
+FPS variation:22.11

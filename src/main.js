@@ -215,9 +215,8 @@ export class Engine {
       });
       this.onFrame = (a) => handler.onFrame(a) || function () {};
       await handler.onCreate(this);
-      var gameLoop = setInterval(async () => {
+      var loop=async () => {
         if (window.destroyed) {
-          clearInterval(gameLoop);
           return;
         }
         this._handleEvents();
@@ -229,7 +228,9 @@ export class Engine {
           "bgra32",
           this.canvas.toBuffer("raw")
         );
-      }, 16.7);
+        setTimeout(loop,0)
+      }
+      setTimeout(loop, 0);
       return this;
     })();
   }

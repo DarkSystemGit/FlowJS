@@ -17,8 +17,8 @@ class Game {
   onFrame() {
     var obj = this.gfx.getObject(this.mario);
     this.gfx.moveObject(this.mario, {
-      x: obj.x +1,
-      y: obj.y +1,
+      x: obj.x +.5,
+      y: obj.y +.5,
     });
   }
 }
