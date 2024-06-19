@@ -218,8 +218,8 @@ export class Engine {
             this._registerEvent("keyboard.*", handler.onKeyPress);
           if(method.includes('onMouse')){
             var mouseEv=method.split('onMouse')[1].toLowerCase()
-            if(['middle','left','right'].includes(mouseEv))this._registerEvent(`mouse.button.${mouseEv}`,handler[method])
-            if(mouseEv=='move')this._registerEvent(`mouse.${mouseEv}`,handler[method])
+            if(['middle','left','right','move'].includes(mouseEv))this._registerEvent(`mouse.${mouseEv}`,handler[method])
+            
           }
         }
       });
@@ -408,12 +408,11 @@ export class Engine {
         }
       });
     }
-
     Object.keys(events.mouse).forEach((ev) => {
       if (
-        (["button.left", "button.right", "button.middle"].includes(ev) &&
+        (["left", "right", "middle"].includes(ev) &&
           sdl.mouse.getButton(
-            sdl.mouse.BUTTON[ev.split(".")[1].toUpperCase()]
+            sdl.mouse.BUTTON[ev.toUpperCase()]
           )) ||
         (ev == "*" &&
           (mousePressed() ||
