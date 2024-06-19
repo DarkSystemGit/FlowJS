@@ -216,6 +216,11 @@ export class Engine {
         if (!["onCreate", "onFrame"].includes(method)) {
           if (method == "onKeyPress")
             this._registerEvent("keyboard.*", handler.onKeyPress);
+          if(method.includes('onMouse')){
+            var mouseEv=method.split('onMouse')[1].toLowerCase()
+            if(['middle','left','right'].includes(mouseEv))this._registerEvent(`mouse.button.${mouseEv}`,handler[method])
+            if(mouseEv=='move')this._registerEvent(`mouse.${mouseEv}`,handler[method])
+          }
         }
       });
       this.onFrame = (a) => handler.onFrame(a) || function () {};

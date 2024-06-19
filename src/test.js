@@ -24,5 +24,8 @@ class Game {
   onKeyPress(k){
     console.log(k) 
   }
+  onMouseMove(m){
+    console.log(m)
+  }
 }
 new Engine(Game, [1280, 720], [1, 1], "Game");
