@@ -1,4 +1,4 @@
-import { Texture, Engine } from "./main.js";
+import { Engine } from "./main.js";
 import path from "node:path";
 import { cwd } from "node:process";
 class MyGame {
