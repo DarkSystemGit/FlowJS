@@ -209,6 +209,7 @@ export class Engine {
       this.uuid = 0;
       this.objects = new Map();
       this.mouse = [];
+      this.mouseClicks = [];
       this.keyboard = [[0, 0]];
       this.assets = new AssetManager();
       var handler = new handlerClass(new GFX(this), this);
@@ -216,10 +217,10 @@ export class Engine {
         if (!["onCreate", "onFrame"].includes(method)) {
           if (method == "onKeyPress")
             this._registerEvent("keyboard.*", handler.onKeyPress);
-          if(method.includes('onMouse')){
-            var mouseEv=method.split('onMouse')[1].toLowerCase()
-            if(['middle','left','right','move'].includes(mouseEv))this._registerEvent(`mouse.${mouseEv}`,handler[method])
-            
+          if (method.includes("onMouse")) {
+            var mouseEv = method.split("onMouse")[1].toLowerCase();
+            if (["middle", "left", "right", "move"].includes(mouseEv))
+              this._registerEvent(`mouse.${mouseEv}`, handler[method]);
           }
         }
       });
@@ -383,6 +384,7 @@ export class Engine {
     var events = this.events;
     var keys = sdl.keyboard.getState();
     this.mouse.push(sdl.mouse.position);
+    if (mousePressed()) this.mouseClicks.push(Date.now());
     if (!(indexesOf(keys, true).map((i) => sdl.keyboard.getKey(i)).length == 0))
       this.keyboard.push([
         indexesOf(keys, true).map((i) => sdl.keyboard.getKey(i)),
@@ -409,22 +411,24 @@ export class Engine {
       });
     }
     Object.keys(events.mouse).forEach((ev) => {
+      
       if (
         (["left", "right", "middle"].includes(ev) &&
-          sdl.mouse.getButton(
-            sdl.mouse.BUTTON[ev.toUpperCase()]
-          )) ||
+          sdl.mouse.getButton(sdl.mouse.BUTTON[ev.toUpperCase()])) ||
         (ev == "*" &&
           (mousePressed() ||
             !util.isDeepStrictEqual(
               this.mouse[this.mouse.length - 1],
               this.mouse[this.mouse.length - 2]
-            )))
-      ) {
-        events.mouse[ev].forEach((f) => f(this));
+            ))
+      )) {
+        if(this.mouseClicks.length > 1 &&
+          this.mouseClicks[this.mouseClicks.length - 1] -
+            this.mouseClicks[this.mouseClicks.length - 2] >
+            20)events.mouse[ev].forEach((f) => f(this));
       }
       if (ev == "move") {
-        //the following if statement was sponsered by bad langauge design choices
+        //the following statement was sponsered by bad langauge design choices
         if (
           this.mouse.length > 1 &&
           !util.isDeepStrictEqual(

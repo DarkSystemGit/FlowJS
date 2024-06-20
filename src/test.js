@@ -21,5 +21,11 @@ class Game {
       y: obj.y +.5,
     });
   }
+  onMouseLeft(){
+    console.log('mouseLeft',Date.now())
+  }
+  onMouseRight(){
+    console.log('mouseRight',Date.now())
+  }
 }
 new Engine(Game, [1280, 720], [1, 1], "Game");
