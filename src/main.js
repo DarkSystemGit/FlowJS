@@ -493,3 +493,15 @@ class AssetManager {
     return Object.keys(this.assets);
   }
 }
+/**
+   * Game interface to be implemented by user  
+   * @member {GFX} gfx 
+   * @property {Engine} engine 
+   */
+export class Game{
+
+  constructor(gfx,engine){
+    this.gfx=gfx
+    this.engine=engine
+  }
+}
