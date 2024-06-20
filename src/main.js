@@ -411,7 +411,6 @@ export class Engine {
       });
     }
     Object.keys(events.mouse).forEach((ev) => {
-      
       if (
         (["left", "right", "middle"].includes(ev) &&
           sdl.mouse.getButton(sdl.mouse.BUTTON[ev.toUpperCase()])) ||
@@ -420,12 +419,15 @@ export class Engine {
             !util.isDeepStrictEqual(
               this.mouse[this.mouse.length - 1],
               this.mouse[this.mouse.length - 2]
-            ))
-      )) {
-        if(this.mouseClicks.length > 1 &&
+            )))
+      ) {
+        if (
+          this.mouseClicks.length > 1 &&
           this.mouseClicks[this.mouseClicks.length - 1] -
             this.mouseClicks[this.mouseClicks.length - 2] >
-            20)events.mouse[ev].forEach((f) => f(this));
+            20
+        )
+          events.mouse[ev].forEach((f) => f(this));
       }
       if (ev == "move") {
         //the following statement was sponsered by bad langauge design choices
