@@ -47,11 +47,11 @@ const indexesOf = (arr, item) =>
 class GFX {
   /**
    * Drawing interface
-   * @param {Screen} screen Screen object
+   * @param {Screen} engine Engine object
    */
-  constructor(screen) {
-    this.ctx = screen.ctx;
-    this.screen = screen;
+  constructor(engine) {
+    this.ctx = engine.ctx;
+    this.engine = engine;
   }
   /**
    * Draw a PixelArray or Texture to the screen
@@ -62,7 +62,7 @@ class GFX {
    * @returns {Number}
    */
   draw(x, y, z, pixels) {
-    return this.screen.draw(
+    return this.engine.draw(
       Canvas.createImageData(pixels._getData(), ...pixels.getShape()),
       x,
       y,
@@ -80,7 +80,7 @@ class GFX {
    *  @param {number} newPosition.z Z Cord
    */
   moveObject(id, newPosition) {
-    this.screen.changeObject(id, newPosition);
+    this.engine.changeObject(id, newPosition);
   }
   /**
    * Gets an objects data
@@ -88,7 +88,7 @@ class GFX {
    * @returns {object}
    */
   getObject(id) {
-    var obj = this.screen._getObject(id);
+    var obj = this.engine._getObject(id);
     return { x: obj.x, y: obj.y, z: obj.z, angle: obj.rotation };
   }
   /**
@@ -97,7 +97,7 @@ class GFX {
    * @param {Texture|PixelArray} texture New Texture
    */
   changeObjectTexture(id, texture) {
-    this.screen.changeObject(id, {
+    this.engine.changeObject(id, {
       pixels: Canvas.createImageData(texture._getData(), ...texture.getShape()),
     });
   }
@@ -107,24 +107,24 @@ class GFX {
    * @param {number} degrees Rotation Angle
    */
   rotateObject(id, degrees) {
-    this.screen.changeObject(id, { rotation: degrees });
+    this.engine.changeObject(id, { rotation: degrees });
   }
   /**
    * Fills the screen with a color
    * @param {Array<number>} color RGBA color
    */
   fillScreen(color) {
-    this.screen._clear();
-    var fill = new PixelArray(...this.screen.dimensions);
+    this.engine._clear();
+    var fill = new PixelArray(...this.engine.dimensions);
     fill.fill(color || [0, 0, 0, 255]);
     this.draw(0, 0, -Infinity, fill);
   }
   /**
    * Update screen instance
-   * @param {Screen} screen Screen object
+   * @param {Screen} engine Engine object
    */
-  updateScreen(screen) {
-    this.screen = screen;
+  updateScreen(engine) {
+    this.engine = engine;
   }
 }
 export class PixelArray {
@@ -275,6 +275,12 @@ export class Engine {
     return this.assets.getTexture(name);
   }
   /**
+   * Gets current mouse position
+   */
+  getMousePos() {
+    return this.mouse[this.mouse.length - 1];
+  }
+  /**
    * Draws an object to the screen, returns a object id
    * @param {ImageData} pixels Object's ImageData
    * @param {Number} x X cord
@@ -383,7 +389,7 @@ export class Engine {
   _handleEvents() {
     var events = this.events;
     var keys = sdl.keyboard.getState();
-    this.mouse.push(sdl.mouse.position);
+    this.mouse.push({x:sdl.mouse.position.x-this.window.x,y:sdl.mouse.position.y-this.window.y});
     if (mousePressed()) this.mouseClicks.push(Date.now());
     if (!(indexesOf(keys, true).map((i) => sdl.keyboard.getKey(i)).length == 0))
       this.keyboard.push([
@@ -439,7 +445,7 @@ export class Engine {
           )
         )
           events.mouse[ev].forEach((f) =>
-            f(this.mouse[this.mouse.length - 2], this)
+            f(this.mouse[this.mouse.length - 1], this)
           );
       }
     });
@@ -494,14 +500,95 @@ class AssetManager {
   }
 }
 /**
-   * Game interface to be implemented by user  
-   * @member {GFX} gfx 
-   * @property {Engine} engine 
+ * Game interface to be implemented by user
+ * @member {GFX} gfx
+ * @property {Engine} engine
+ */
+export class Game {
+  constructor(gfx, engine) {
+    this.gfx = gfx;
+    this.engine = engine;
+  }
+  onFrame() {}
+  /**
+   * Internal method to add events
+   * @param {String} method
+   * @param {Function} handler
    */
-export class Game{
-
-  constructor(gfx,engine){
-    this.gfx=gfx
-    this.engine=engine
+  _rEv(method, handler) {
+    if (!["onCreate", "onFrame"].includes(method)) {
+      if (method == "onKeyPress")
+        this.engine._registerEvent("keyboard.*", handler);
+      if (method.includes("onMouse")) {
+        var mouseEv = method.split("onMouse")[1].toLowerCase();
+        if (["middle", "left", "right", "move"].includes(mouseEv))
+          this.engine._registerEvent(`mouse.${mouseEv}`, handler);
+      }
+    }
+  }
+}
+export class Sprite {
+  constructor(game) {
+    this.gfx = game.gfx;
+    this.engine = game.engine;
+    this.obj = { x: 0, y: 0, z: 0 };
+    this.velocity = [0, 0];
+    var events=["onMouseLeft", "onMouseMove", "onMouseRight", "onKeyPress"]
+    classMethods(this)
+      .forEach((m) => game._rEv(m, this[m]))
+    events.forEach(
+        (e) => {
+          if (this[e]) game._rEv(e, this[e]);
+        }
+      );
+     var inRange=(x,y,width,height)=>{
+      var mouse=Object.values(this.engine.mouse[this.engine.mouse.length-1])
+      return ((x+width)>=mouse[0])&&(mouse[0]>=x)&&((y+height)>=mouse[1])&&(mouse[1]>=y)
+     } 
+    if(this.onClick){
+      game._rEv("onMouseLeft", ()=>{if(inRange(this.obj.x,this.obj.y,...this.texture.getShape()))this.onClick()});
+      game._rEv("onMouseRight", ()=>{if(inRange(this.obj.x,this.obj.y,...this.texture.getShape()))this.onClick()});
+    }  
+    this.onCreate();
+  }
+  /**
+   * Loads a texture
+   * @param {String|Texture} texture Asset or Texture to load
+   */
+  loadTexture(texture) {
+    if (typeof texture == "string")
+      var ntexture = this.engine.convertAssetToTexture(texture);
+    this.texture = ntexture;
+  }
+  render() {
+    this.obj.x += this.velocity[0];
+    this.obj.y += this.velocity[1];
+    if (this.onFrame) this.onFrame();
+    if (!this.id) {
+      this.id = this.gfx.draw(this.obj.x, this.obj.y, this.obj.z, this.texture);
+    } else {
+      this.obj.pixels = Canvas.createImageData(
+        this.texture._getData(),
+        ...this.texture.getShape()
+      );
+      this.engine.changeObject(this.id, this.obj);
+    }
+    this.obj = this.gfx.getObject(this.id);
+  }
+  changeSprite(newObj) {
+    Object.keys(newObj).forEach((k) => (this.obj[k] = newObj[k]));
+  }
+  move(x, y) {
+    this.changeSprite({ x: this.obj.x + x, y: this.obj.y + y });
+  }
+  rotate(degrees) {
+    this.changeSprite({ rotation: degrees });
+  }
+  changeVelocity(x, y) {
+    this.velocity[0] += x;
+    this.velocity[1] += y;
+  }
+  changeLayer(layer) {
+    this.obj.z = layer;
   }
 }
