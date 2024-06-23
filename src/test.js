@@ -6,7 +6,8 @@ class Mario extends Sprite{
     this.loadTexture('mario')
   }
   onFrame(){
-    this.move(1,1)
+    this.changeSprite(this.engine.getMousePos())
+    this.rotate(1)
   }
   onClick(){
     console.log('click')

@@ -12,7 +12,8 @@ function createImageBitmap(pix, w, h) {
   tmpCanvas.getContext("2d").putImageData(pix, 0, 0);
   return tmpCanvas;
 }
-
+const angle = (anchor, point) =>
+  (Math.atan2(anchor.y - point.y, anchor.x - point.x) * 180) / Math.PI + 180;
 const processArr = (array) => {
   return array.flat(1);
 };
@@ -226,7 +227,7 @@ export class Engine {
       });
       this.onFrame = (a) => handler.onFrame(a) || function () {};
       await handler.onCreate(this);
-      var loop = async () => {
+      var gameLoop = async () => {
         if (window.destroyed) {
           return;
         }
@@ -239,9 +240,9 @@ export class Engine {
           "bgra32",
           this.canvas.toBuffer("raw")
         );
-        setTimeout(loop, 0);
+        setTimeout(gameLoop, 0);
       };
-      setTimeout(loop, 0);
+      setTimeout(gameLoop, 0);
       return this;
     })();
   }
@@ -389,7 +390,10 @@ export class Engine {
   _handleEvents() {
     var events = this.events;
     var keys = sdl.keyboard.getState();
-    this.mouse.push({x:sdl.mouse.position.x-this.window.x,y:sdl.mouse.position.y-this.window.y});
+    this.mouse.push({
+      x: sdl.mouse.position.x - this.window.x,
+      y: sdl.mouse.position.y - this.window.y,
+    });
     if (mousePressed()) this.mouseClicks.push(Date.now());
     if (!(indexesOf(keys, true).map((i) => sdl.keyboard.getKey(i)).length == 0))
       this.keyboard.push([
@@ -533,22 +537,32 @@ export class Sprite {
     this.engine = game.engine;
     this.obj = { x: 0, y: 0, z: 0 };
     this.velocity = [0, 0];
-    var events=["onMouseLeft", "onMouseMove", "onMouseRight", "onKeyPress"]
-    classMethods(this)
-      .forEach((m) => game._rEv(m, this[m]))
-    events.forEach(
-        (e) => {
-          if (this[e]) game._rEv(e, this[e]);
-        }
+    var events = ["onMouseLeft", "onMouseMove", "onMouseRight", "onKeyPress"];
+    classMethods(this).forEach((m) => game._rEv(m, this[m]));
+    events.forEach((e) => {
+      if (this[e]) game._rEv(e, this[e]);
+    });
+    var inRange = (x, y, width, height) => {
+      var mouse = Object.values(
+        this.engine.mouse[this.engine.mouse.length - 1]
       );
-     var inRange=(x,y,width,height)=>{
-      var mouse=Object.values(this.engine.mouse[this.engine.mouse.length-1])
-      return ((x+width)>=mouse[0])&&(mouse[0]>=x)&&((y+height)>=mouse[1])&&(mouse[1]>=y)
-     } 
-    if(this.onClick){
-      game._rEv("onMouseLeft", ()=>{if(inRange(this.obj.x,this.obj.y,...this.texture.getShape()))this.onClick()});
-      game._rEv("onMouseRight", ()=>{if(inRange(this.obj.x,this.obj.y,...this.texture.getShape()))this.onClick()});
-    }  
+      return (
+        x + width >= mouse[0] &&
+        mouse[0] >= x &&
+        y + height >= mouse[1] &&
+        mouse[1] >= y
+      );
+    };
+    if (this.onClick) {
+      game._rEv("onMouseLeft", () => {
+        if (inRange(this.obj.x, this.obj.y, ...this.texture.getShape()))
+          this.onClick();
+      });
+      game._rEv("onMouseRight", () => {
+        if (inRange(this.obj.x, this.obj.y, ...this.texture.getShape()))
+          this.onClick();
+      });
+    }
     this.onCreate();
   }
   /**
@@ -558,6 +572,13 @@ export class Sprite {
   loadTexture(texture) {
     if (typeof texture == "string")
       var ntexture = this.engine.convertAssetToTexture(texture);
+    if (this.id)
+      this.engine.changeObject(this.id,{
+        pixels: Canvas.createImageData(
+          this.texture._getData(),
+          ...this.texture.getShape()
+        ),
+      });
     this.texture = ntexture;
   }
   render() {
@@ -567,10 +588,6 @@ export class Sprite {
     if (!this.id) {
       this.id = this.gfx.draw(this.obj.x, this.obj.y, this.obj.z, this.texture);
     } else {
-      this.obj.pixels = Canvas.createImageData(
-        this.texture._getData(),
-        ...this.texture.getShape()
-      );
       this.engine.changeObject(this.id, this.obj);
     }
     this.obj = this.gfx.getObject(this.id);
