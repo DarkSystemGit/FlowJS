@@ -7,7 +7,6 @@ class Mario extends Sprite{
   }
   onFrame(){
     this.changeSprite(this.engine.getMousePos())
-    this.rotate(1)
   }
   onClick(){
     console.log('click')

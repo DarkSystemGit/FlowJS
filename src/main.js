@@ -13,16 +13,14 @@ function createImageBitmap(pix, w, h) {
   return tmpCanvas;
 }
 const angle = (anchor, point) =>
-  (Math.atan2(anchor[1] - point[1], anchor[0] - point[0]) * 180) / Math.PI + 180;
-const inCollisionRange=(cords1,dims,cords2)=>{
-  return (
-    cords1[0] + dims[0] >= cords2[0] &&
-    cords2[0] >= cords1[0] &&
-    cords1[1] + dims[1] >= cords2[1] &&
-    cords2[1] >= cords1[1]
-  );
-}
-const colliding=(cords)=>{}
+  (Math.atan2(anchor[1] - point[1], anchor[0] - point[0]) * 180) / Math.PI +
+  180;
+const colliding = (obj1, obj2) =>
+  obj1.x < obj2.x + obj2.width &&
+  obj1.x + obj1.width > obj2.x &&
+  obj1.y < obj2.y + obj2.height &&
+  obj1.y + obj1.height > obj2.y;
+
 const processArr = (array) => {
   return array.flat(1);
 };
@@ -189,6 +187,10 @@ export class Texture extends PixelArray {
   rotate(degrees) {
     this.rotation = degrees;
   }
+  /**
+   * Gets rotation angle
+   * @returns {Number} angle
+   */
   getAngle() {
     return this.rotation;
   }
@@ -380,6 +382,34 @@ export class Engine {
     );
     return item;
   }
+  /**
+   * Gets colliding objects
+   * @param {number} id Object ID
+   */
+  getObjectCollisions(id) {
+    var obj = this._getObject(id);
+    return this.objects
+      .get(obj.z)
+      .map((obj2) => {
+        obj.width = obj.shape[0];
+        obj.height = obj.shape[1];
+        obj2.width = obj2.shape[0];
+        obj2.height = obj2.shape[1];
+        return {
+          id: obj.id,
+          col: colliding(obj, obj2),
+          angle: angle(
+            [obj.x + obj.shape[0] / 2, obj.y + obj.shape[1] / 2],
+            [obj2.x + obj2.shape[0] / 2, obj2.y + obj2.shape[1] / 2]
+          ),
+        };
+      })
+      .filter((obj2) => obj2.col)
+      .map((i) => {
+        delete i.col;
+        return i;
+      }).filter(i=>i.id!=obj.id);
+  }
   /** Internal method to clear screen */
   _clear() {
     this.objects.clear();
@@ -522,6 +552,9 @@ export class Game {
     this.gfx = gfx;
     this.engine = engine;
   }
+  /**
+   * Called on each frame
+   */
   onFrame() {}
   /**
    * Internal method to add events
@@ -541,6 +574,9 @@ export class Game {
   }
 }
 export class Sprite {
+  /**
+   * @param {Game} game
+   */
   constructor(game) {
     this.gfx = game.gfx;
     this.engine = game.engine;
@@ -582,7 +618,7 @@ export class Sprite {
     if (typeof texture == "string")
       var ntexture = this.engine.convertAssetToTexture(texture);
     if (this.id)
-      this.engine.changeObject(this.id,{
+      this.engine.changeObject(this.id, {
         pixels: Canvas.createImageData(
           this.texture._getData(),
           ...this.texture.getShape()
@@ -590,10 +626,13 @@ export class Sprite {
       });
     this.texture = ntexture;
   }
+  /**
+   * Renders the spriteto the screen
+   */
   render() {
     this.obj.x += this.velocity[0];
     this.obj.y += this.velocity[1];
-    if (this.onFrame) this.onFrame();
+    if (this.onFrame && this.id) this.onFrame();
     if (!this.id) {
       this.id = this.gfx.draw(this.obj.x, this.obj.y, this.obj.z, this.texture);
     } else {
@@ -601,20 +640,49 @@ export class Sprite {
     }
     this.obj = this.gfx.getObject(this.id);
   }
+  /**
+   * Changes the sprite
+   * @param {Object} newObj
+   */
   changeSprite(newObj) {
     Object.keys(newObj).forEach((k) => (this.obj[k] = newObj[k]));
   }
+  /**
+   * Moves a sprite to a x,y position
+   * @param {Number} x
+   * @param {Number} y
+   */
   move(x, y) {
     this.changeSprite({ x: this.obj.x + x, y: this.obj.y + y });
   }
+  /**
+   * Rotates a sprite
+   * @param {Number} degrees
+   */
   rotate(degrees) {
     this.changeSprite({ rotation: degrees });
   }
+  /**
+   * Changes a sprite's velocity
+   * @param {Number} x
+   * @param {Number} y
+   */
   changeVelocity(x, y) {
     this.velocity[0] += x;
     this.velocity[1] += y;
   }
+  /**
+   * Changes a sprites Z-axis
+   * @param {Number} layer
+   */
   changeLayer(layer) {
     this.obj.z = layer;
+  }
+  /**
+   * Gets colliding objects
+   * @returns {Array<Object>}
+   */
+  getCollisions() {
+    return this.engine.getObjectCollisions(this.id);
   }
 }

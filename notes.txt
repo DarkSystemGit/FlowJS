@@ -4,5 +4,3 @@ Total allowable frame time:25.17ms
 Min FPS:39.73
 Max FPS:61.84
 FPS variation:22.11
-Collisons:
-if(inRange(this.center+width/2,[otherObj-width/2,otherObj+width/2])&&...insert code for y...)return colliding
