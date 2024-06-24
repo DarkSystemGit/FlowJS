@@ -13,7 +13,16 @@ function createImageBitmap(pix, w, h) {
   return tmpCanvas;
 }
 const angle = (anchor, point) =>
-  (Math.atan2(anchor.y - point.y, anchor.x - point.x) * 180) / Math.PI + 180;
+  (Math.atan2(anchor[1] - point[1], anchor[0] - point[0]) * 180) / Math.PI + 180;
+const inCollisionRange=(cords1,dims,cords2)=>{
+  return (
+    cords1[0] + dims[0] >= cords2[0] &&
+    cords2[0] >= cords1[0] &&
+    cords1[1] + dims[1] >= cords2[1] &&
+    cords2[1] >= cords1[1]
+  );
+}
+const colliding=(cords)=>{}
 const processArr = (array) => {
   return array.flat(1);
 };
