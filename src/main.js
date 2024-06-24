@@ -214,14 +214,17 @@ export class Engine {
         height: dimensions[1],
       }));
       this.events = { keyboard: {}, mouse: {} };
-      this.canvas = Canvas.createCanvas(...dimensions);
+      this.canvas=Canvas.createCanvas(...dimensions)
       this.ctx = this.canvas.getContext("2d");
+      this.screenCanvas=Canvas.createCanvas(dimensions[0]*scale[0],dimensions[1]*scale[1])
+      this.screenCtx=this.screenCanvas.getContext('2d')
       this.scale = scale;
       this.dimensions = dimensions;
       this.uuid = 0;
       this.objects = new Map();
       this.mouse = [];
       this.mouseClicks = [];
+      this.camera=[0,0]
       this.keyboard = [[0, 0]];
       this.assets = new AssetManager();
       var handler = new handlerClass(new GFX(this), this);
@@ -245,11 +248,12 @@ export class Engine {
         this._handleEvents();
         this.onFrame(this);
         await this._drawObjects();
+        this.screenCtx.drawImage(this.canvas,-1*this.camera[0],-1*this.camera[1],this.dimensions[0]*this.scale[0],this.dimensions[1]*this.scale[1])
         window.render(
           ...this.dimensions,
           this.dimensions[0] * 4,
           "bgra32",
-          this.canvas.toBuffer("raw")
+          this.screenCanvas.toBuffer("raw")
         );
         setTimeout(gameLoop, 0);
       };
@@ -291,6 +295,14 @@ export class Engine {
    */
   getMousePos() {
     return this.mouse[this.mouse.length - 1];
+  }
+  /**
+   * Sets the camera position
+   * @param {Number} x X cord
+   * @param {Number} y Y cord
+   */
+  setCameraPosition(x,y){
+    this.camera=[x||this.camera.x,y||this.camera.y]
   }
   /**
    * Draws an object to the screen, returns a object id
@@ -408,7 +420,8 @@ export class Engine {
       .map((i) => {
         delete i.col;
         return i;
-      }).filter(i=>i.id!=obj.id);
+      })
+      .filter((i) => i.id != obj.id);
   }
   /** Internal method to clear screen */
   _clear() {

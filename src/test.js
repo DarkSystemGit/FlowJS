@@ -8,9 +8,6 @@ class Mario extends Sprite{
   onFrame(){
     this.changeSprite(this.engine.getMousePos())
   }
-  onClick(){
-    console.log('click')
-  }
 }
 class MyGame extends Game{
   async onCreate(engine) {
