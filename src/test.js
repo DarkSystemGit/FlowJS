@@ -6,6 +6,7 @@ class Mario extends Sprite{
     this.loadTexture('mario')
   }
   onFrame(){
+    this.engine.moveCamera(1,1)
     this.changeSprite(this.engine.getMousePos())
   }
 }

@@ -55,7 +55,7 @@ const indexesOf = (arr, item) =>
 class GFX {
   /**
    * Drawing interface
-   * @param {Screen} engine Engine object
+   * @param {Engine} engine Engine object
    */
   constructor(engine) {
     this.ctx = engine.ctx;
@@ -69,14 +69,16 @@ class GFX {
    * @param {PixelArray|Texture} pixels PixelArray or Texture to draw
    * @returns {Number}
    */
-  draw(x, y, z, pixels) {
+  draw(x, y, z, pixels, special) {
     return this.engine.draw(
       Canvas.createImageData(pixels._getData(), ...pixels.getShape()),
       x,
       y,
       z,
       pixels.getShape(),
-      pixels.getAngle()
+      pixels.getAngle(),
+      undefined,
+      special
     );
   }
   /**
@@ -123,9 +125,12 @@ class GFX {
    */
   fillScreen(color) {
     this.engine._clear();
-    var fill = new PixelArray(...this.engine.dimensions);
+    var fill = new PixelArray(
+      this.engine.canvas.width,
+      this.engine.canvas.height
+    );
     fill.fill(color || [0, 0, 0, 255]);
-    this.draw(0, 0, -Infinity, fill);
+    this.draw(0, 0, -Infinity, fill, ["fs", color]);
   }
   /**
    * Update screen instance
@@ -214,17 +219,20 @@ export class Engine {
         height: dimensions[1],
       }));
       this.events = { keyboard: {}, mouse: {} };
-      this.canvas=Canvas.createCanvas(...dimensions)
+      this.canvas = Canvas.createCanvas(...dimensions);
       this.ctx = this.canvas.getContext("2d");
-      this.screenCanvas=Canvas.createCanvas(dimensions[0]*scale[0],dimensions[1]*scale[1])
-      this.screenCtx=this.screenCanvas.getContext('2d')
+      this.screenCanvas = Canvas.createCanvas(
+        dimensions[0] * scale[0],
+        dimensions[1] * scale[1]
+      );
+      this.screenCtx = this.screenCanvas.getContext("2d");
       this.scale = scale;
       this.dimensions = dimensions;
       this.uuid = 0;
       this.objects = new Map();
       this.mouse = [];
       this.mouseClicks = [];
-      this.camera=[0,0]
+      this.camera = [0, 0];
       this.keyboard = [[0, 0]];
       this.assets = new AssetManager();
       var handler = new handlerClass(new GFX(this), this);
@@ -248,7 +256,19 @@ export class Engine {
         this._handleEvents();
         this.onFrame(this);
         await this._drawObjects();
-        this.screenCtx.drawImage(this.canvas,-1*this.camera[0],-1*this.camera[1],this.dimensions[0]*this.scale[0],this.dimensions[1]*this.scale[1])
+        this.screenCtx.clearRect(
+          0,
+          0,
+          this.screenCanvas.width,
+          this.screenCanvas.height
+        );
+        this.screenCtx.drawImage(
+          this.canvas,
+          0,
+          0,
+          this.canvas.width * this.scale[0],
+          this.canvas.height * this.scale[1]
+        );
         window.render(
           ...this.dimensions,
           this.dimensions[0] * 4,
@@ -301,8 +321,23 @@ export class Engine {
    * @param {Number} x X cord
    * @param {Number} y Y cord
    */
-  setCameraPosition(x,y){
-    this.camera=[x||this.camera.x,y||this.camera.y]
+  setCameraPosition(x, y) {
+    this.camera = [x || this.camera[0], y || this.camera[1]];
+  }
+  /**
+   * Gets camera position
+   * @returns {Array<number>} Camera position
+   */
+  getCameraPosition() {
+    return this.camera;
+  }
+  /**
+   * Moves the camera around
+   * @param {Number} x X movement
+   * @param {Number} y Y movement
+   */
+  moveCamera(x, y) {
+    this.camera = [this.camera[0] + (x || 0), this.camera[1] + (y || 0)];
   }
   /**
    * Draws an object to the screen, returns a object id
@@ -315,12 +350,12 @@ export class Engine {
    * @param {Number} oldid
    * @returns {Number} Object ID
    */
-  draw(pixels, x, y, z, shape, angle, oldid) {
+  draw(pixels, x, y, z, shape, angle, oldid, special) {
     var id = oldid || JSON.parse(JSON.stringify(this.uuid));
     this.objects.set(z, this.objects.get(z) || []);
     this.objects
       .get(z)
-      .push({ x, y, z, pixels, shape, id, rotation: angle || 0 });
+      .push({ x, y, z, pixels, shape, id, rotation: angle || 0, special });
     if (!oldid) this.uuid++;
     return id;
   }
@@ -369,11 +404,17 @@ export class Engine {
           this.ctx.drawImage(tmpCanvas, -item.shape[0] / 2, -item.shape[1] / 2);
           this.ctx.restore();
         } else {
-          this.ctx.drawImage(
-            createImageBitmap(item.pixels, ...item.shape),
-            item.x,
-            item.y
-          );
+          if (item.special && item.special[0] == "fs") {
+            this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
+            this.ctx.fill();
+          } else {
+            this.ctx.drawImage(
+              createImageBitmap(item.pixels, ...item.shape),
+              item.x + -1 * this.camera[0],
+              item.y + -1 * this.camera[1]
+            );
+          }
         }
       }
     }
