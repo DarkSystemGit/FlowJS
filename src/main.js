@@ -14,13 +14,14 @@ class Game {
   constructor(gfx, engine) {
     this.gfx = gfx;
     this.engine = engine;
-    this.camera={setPosition:this.engine.setCameraPosition,getPosition:this.engine.setCameraPosition,move:this.engine.moveCamera}
+    this.camera={setPosition:(x,y)=>this.engine.setCameraPosition(),getPosition:()=>this.engine.getCameraPosition(),move:(x,y)=>this.engine.moveCamera(x,y)}
     this.sprites=[]
   }
   /**
    * Called on each frame
    */
   _onFrame() {
+    this.sprites.forEach((s)=>s.render());
     (this.onFrame||(()=>{}))()
   }
   /** Adds a Sprite 

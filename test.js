@@ -14,10 +14,7 @@ class MyGame extends flow.Game {
   async onCreate(engine) {
     await this.engine.loadAsset(path.join(cwd(), "src/test.png"), "mario");
     this.gfx.fillScreen([0, 0, 255, 255]);
-    this.mario = new Mario(this);
-  }
-  onFrame() {
-    this.mario.render();
+    this.addSprite(new Mario(this));
   }
 }
 new flow.Engine(MyGame, [1280, 720], "Game");
