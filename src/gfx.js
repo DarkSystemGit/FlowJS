@@ -82,10 +82,33 @@ export class GFX {
     this.draw(0, 0, -Infinity, fill, ["fs", color]);
   }
   /**
-   * Update screen instance
-   * @param {Screen} engine Engine object
+   * Sets layer background
+   * @param {Texture|String} texture
    */
-  updateScreen(engine) {
+  setLayerBackground(layer, texture) {
+    if (typeof texture == "string")
+      texture = this.engine.convertAssetToTexture(texture);
+    this.engine.objects.set(layer, this.engine.objects.get(layer) || []);
+    this.engine.objects
+      .get(layer)
+      .unshift({
+        pixels: Canvas.createImageData(
+          texture._getData(),
+          ...texture.getShape()
+        ),
+        x: 0,
+        y: 0,
+        z: layer,
+        shape: texture.getShape(),
+        rotation: 0,
+        special: undefined,
+      });
+  }
+  /**
+   * Update engine instance
+   * @param {Engine} engine Engine object
+   */
+  updateEngine(engine) {
     this.engine = engine;
   }
 }

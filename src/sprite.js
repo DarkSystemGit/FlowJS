@@ -12,9 +12,9 @@ export class Sprite {
     this.obj = { x: 0, y: 0, z: 0 };
     this.velocity = [0, 0];
     var events = ["onMouseLeft", "onMouseMove", "onMouseRight", "onKeyPress"];
-    classMethods(this).forEach((m) => game._rEv(m, this[m]));
+    classMethods(this).forEach((m) => game._rEv(m, (...args)=>this[m](...args)));
     events.forEach((e) => {
-      if (this[e]) game._rEv(e, this[e]);
+      if (this[e]) game._rEv(e, (...args)=>this[e](...args));
     });
     var inRange = (x, y, width, height) => {
       var mouse = Object.values(

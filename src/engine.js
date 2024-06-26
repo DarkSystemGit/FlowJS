@@ -20,7 +20,7 @@ export class Engine {
   constructor(handlerClass, dimensions, title, scale) {
     return (async () => {
       const window = (this.window = sdl.video.createWindow({
-        resizable: false,
+        resizable: true,
         accelerated: true,
         title,
         width: dimensions[0],
@@ -58,9 +58,6 @@ export class Engine {
       this.onFrame = (a) => handler._onFrame(a) || function () {};
       await handler.onCreate(this);
       var gameLoop = async () => {
-        if (window.destroyed) {
-          return;
-        }
         this._handleEvents();
         this.onFrame(this);
         await this._drawObjects();
@@ -77,6 +74,9 @@ export class Engine {
           this.canvas.width * this.scale[0],
           this.canvas.height * this.scale[1]
         );
+        if (window.destroyed) {
+          return;
+        }
         window.render(
           ...this.dimensions,
           this.dimensions[0] * 4,

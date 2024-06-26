@@ -21,14 +21,23 @@ class Game {
    * Called on each frame
    */
   _onFrame() {
-    this.sprites.forEach((s)=>s.render());
+    this.sprites.forEach((s)=>s?s.render():undefined);
     (this.onFrame||(()=>{}))()
   }
-  /** Adds a Sprite 
+  /** Adds a Sprite to be drawn
    * @param {Sprite} sprite 
+   * @returns {Number} Sprite id
   */
   addSprite(sprite){
     this.sprites.push(sprite)
+    return this.sprites.length-1
+  }
+  /**
+   * Removes a sprite
+   * @param {Number} id 
+   */
+  removeSprite(id){
+    delete this.sprites[id]
   }
   /**
    * Internal method to add events
