@@ -11,7 +11,7 @@ class Mario extends flow.Sprite {
   }
 }
 class MyGame extends flow.Game {
-  async onCreate(engine) {
+  async onCreate() {
     await this.engine.loadAsset(path.join(cwd(), "src/test.png"), "mario");
     this.gfx.fillScreen([0, 0, 255, 255]);
     this.addSprite(new Mario(this));
