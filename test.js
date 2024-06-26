@@ -6,7 +6,6 @@ class Mario extends flow.Sprite {
     this.loadTexture("mario");
   }
   onFrame() {
-    this.camera.move(1, 1);
     this.changeSprite(this.engine.getMousePos());
   }
 }
