@@ -6,7 +6,7 @@ import { PNG } from "pngjs";
 
 export function createImageBitmap(pix, w, h) {
   var tmpCanvas = Canvas.createCanvas(w, h);
-  tmpCanvas.getContext("2d").putImageData(pix, 0, 0);
+  tmpCanvas.getContext("2d").putImageData(pix, 0, 0,0,0,w,h);
   return tmpCanvas;
 }
 export const angle = (anchor, point) =>

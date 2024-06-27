@@ -208,7 +208,7 @@ export class Engine {
           this.ctx.rotate((Math.PI * item.rotation) / 360);
           var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
           var tmpCtx = tmpCanvas.getContext("2d");
-          tmpCtx.putImageData(item.pixels, 0, 0);
+          tmpCtx.putImageData(item.pixels, 0, 0,0,0,item.shape[0],item.shape[1]);
           this.ctx.drawImage(tmpCanvas, -item.shape[0] / 2, -item.shape[1] / 2);
           this.ctx.restore();
         } else {

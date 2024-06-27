@@ -53,6 +53,14 @@ export class Texture extends PixelArray {
     this.rotation = degrees;
   }
   /**
+   * Resizes a texture to a specific size
+   * @param {Number} width 
+   * @param {Number} height 
+   */
+  setDimensions(width,height){
+    this.obj.shape=[width,height,4]
+  }
+  /**
    * Gets rotation angle
    * @returns {Number} angle
    */
