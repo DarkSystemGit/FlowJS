@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [        
         {
+            "name": "Launch Program GPGPU",
+            "program": "${workspaceFolder}/lib/gpgpu/lib/test.mjs",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+
+        {
             "type": "node",
             "request": "launch",
             "name": "Launch Program",

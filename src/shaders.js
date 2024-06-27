@@ -24,35 +24,29 @@ const getFunction = (func, file) => {
   );
   return ret;
 };
-const genShader = (shader) => {
-  shader=getFunction('shader',shader) 
-  console.log(shader) 
+const genShader = (shader) => { 
+  shader=getFunction('main',shader) 
+  console.log(shader)
   var params=shader.params.filter((i)=>!(['vec4 pixel', 'int x', 'int y'].includes(i)))
 
-  return `#version 300 es
+  return generate(parser.parse(`
     in vec4 pixel;
     in int i;
     in int width;
-    ${eParamsDef}
+    ${params.map((p)=>'in '+p).join(';')+';'}
     out vec4 color;
     vec4 shader(vec4 pixel, int x, int y);
     void main(){
         int x=i% dims[0];
         int y=i/dims[0];
-        color = shader(pixel,x,y${eParams});
+        color = shader(pixel,x,y${','+params.map((p)=>p.split(' ')[1]).join(',')});
     }
-    vec4 shader(vec4 pixel, int x, int y${efParams}){
-        ${shaderContents}
+    vec4 shader(vec4 pixel, int x, int y${','+params.join(',')}){
+        ${shader.body}
     }
-    `;
+    `));
 };
-console.log(genShader(`
-vec4 shader(vec4 pixel, int x, int y, float[] lights,float lightsLength){
-    vec4 lpixel=pixel;
-    vec4 lightedPix[lightsLength];
-    for(int pix=0;pix<lightsLength;++pix)
-      {
-      lightedPix[pix]=vec4(lpixel.r,lpixel.g,lpixel.b,lpixel.a*lights[pix]);
-    }
+console.log(genShader(`vec4 main(vec4 pixel, int x, int y, float lights){
+    return pixel;
 }
 `))
