@@ -61,6 +61,7 @@ export class Engine {
         this._handleEvents();
         this.onFrame(this);
         await this._drawObjects();
+        
         this.screenCtx.clearRect(
           0,
           0,

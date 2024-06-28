@@ -17,13 +17,10 @@
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "@kmamal/sdl": "^0.10.7",
-    "@shaderfrog/glsl-parser": "^4.0.0",
     "@unpic/pixels": "^1.2.2",
     "canvas": "^2.11.2",
     "class-methods": "^1.0.12",
     "fast-brc": "^0.0.1",
-    "gl": "^8.0.2",
-    "gpgpu": "^0.0.5",
     "jpeg-js": "^0.4.4",
     "pngjs": "^7.0.0"
   },
