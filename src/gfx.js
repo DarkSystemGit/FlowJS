@@ -81,6 +81,11 @@ export class GFX {
     fill.fill(color || [0, 0, 0, 255]);
     this.draw(0, 0, -Infinity, fill, ["fs", color]);
   }
+  /** Gets an asset's texture 
+   * @param {String} texture
+   * @returns {Texture} Asset texture
+  */
+  getTexture(texture){return this.engine.convertAssetToTexture(texture);}
   /**
    * Sets layer background
    * @param {Texture|String} texture

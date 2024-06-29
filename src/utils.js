@@ -3,7 +3,7 @@ import sdl from "@kmamal/sdl";
 import Canvas from "canvas";
 import jpeg from "jpeg-js";
 import { PNG } from "pngjs";
-
+export const clone=(obj)=>JSON.parse(JSON.stringify(obj))
 export function createImageBitmap(pix, w, h) {
   var tmpCanvas = Canvas.createCanvas(w, h);
   tmpCanvas.getContext("2d").putImageData(pix, 0, 0,0,0,w,h);

@@ -16,6 +16,7 @@ class Game {
     this.engine = engine;
     this.camera={setPosition:(x,y)=>this.engine.setCameraPosition(),getPosition:()=>this.engine.getCameraPosition(),move:(x,y)=>this.engine.moveCamera(x,y)}
     this.sprites=[]
+    if(this.shader)this.engine.setShaderFunc(this.shader)
   }
   /**
    * Called on each frame

@@ -3,7 +3,14 @@ import Canvas from "canvas";
 import classMethods from "class-methods";
 import util from "node:util";
 import { GFX } from "./gfx.js";
-import { indexesOf, createImageBitmap, colliding, angle, getPixels,mousePressed } from "./utils.js";
+import {
+  indexesOf,
+  createImageBitmap,
+  colliding,
+  angle,
+  getPixels,
+  mousePressed,
+} from "./utils.js";
 import brc from "fast-brc";
 import { readFile } from "node:fs/promises";
 import { Texture } from "./texture.js";
@@ -40,6 +47,8 @@ export class Engine {
       this.objects = new Map();
       this.mouse = [];
       this.mouseClicks = [];
+      this.shaders = [
+      ];
       this.camera = [0, 0];
       this.keyboard = [[0, 0]];
       this.assets = new AssetManager();
@@ -61,15 +70,37 @@ export class Engine {
         this._handleEvents();
         this.onFrame(this);
         await this._drawObjects();
-        
+
         this.screenCtx.clearRect(
           0,
           0,
           this.screenCanvas.width,
           this.screenCanvas.height
         );
-        this.screenCtx.drawImage(
-          this.canvas,
+        var gameCanvas = this.ctx.getImageData(
+          0,
+          0,
+          this.canvas.width,
+          this.canvas.height
+        );
+        if (this.shaders.length > 0) {
+          var data = new Uint8ClampedArray(gameCanvas.data.length);
+          for (var i = 0; i < gameCanvas.data.length; i = i + 4) {
+            var pix = gameCanvas.data.slice(i, i + 4);
+            pix =
+              this.shaders[0](
+                (i / 4) % this.canvas.width,
+                i / 4 / this.canvas.width,
+                pix
+              ) || pix;
+            data.set(pix, i);
+          }
+          gameCanvas = Canvas.createImageData(data, this.canvas.width);
+        }
+        this.screenCtx.putImageData(
+          gameCanvas,
+          0,
+          0,
           0,
           0,
           this.canvas.width * this.scale[0],
@@ -104,6 +135,11 @@ export class Engine {
   listAssets() {
     return this.assets.listTextures();
   }
+  /**
+   * Sets the game shader
+   * @param {Function} shader 
+   */
+  setShaderFunc(shader){this.shaders[0]=shader}
   /**
    * Removes an asset from storage
    * @param {String} name Name of asset
@@ -209,7 +245,15 @@ export class Engine {
           this.ctx.rotate((Math.PI * item.rotation) / 360);
           var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
           var tmpCtx = tmpCanvas.getContext("2d");
-          tmpCtx.putImageData(item.pixels, 0, 0,0,0,item.shape[0],item.shape[1]);
+          tmpCtx.putImageData(
+            item.pixels,
+            0,
+            0,
+            0,
+            0,
+            item.shape[0],
+            item.shape[1]
+          );
           this.ctx.drawImage(tmpCanvas, -item.shape[0] / 2, -item.shape[1] / 2);
           this.ctx.restore();
         } else {
@@ -405,4 +449,3 @@ export class AssetManager {
     return Object.keys(this.assets);
   }
 }
-
