@@ -18,7 +18,7 @@ export class GFX {
    * @param {PixelArray|Texture} pixels PixelArray or Texture to draw
    * @returns {Number}
    */
-  draw(x, y, z, pixels, special) {
+  draw(x, y, z, pixels) {
     return this.engine.draw(
       Canvas.createImageData(pixels._getData(), ...pixels.getShape()),
       x,
@@ -27,7 +27,7 @@ export class GFX {
       pixels.getShape(),
       pixels.getAngle(),
       undefined,
-      special
+      pixels.special
     );
   }
   /**
@@ -106,7 +106,7 @@ export class GFX {
         z: layer,
         shape: texture.getShape(),
         rotation: 0,
-        special: undefined,
+        special: texture.special,
       });
   }
   /**

@@ -3,7 +3,6 @@ import { processArr,clone } from "./utils.js";
 export class PixelArray {
   constructor(w, h, data) {
     this.obj = { data: data || Array(w * h * 4), shape: [w, h, 4] };
-    this.obj.rshape=clone(this.obj.shape)
   }
   /**
    * Fills the Array
@@ -59,7 +58,7 @@ export class Texture extends PixelArray {
    * @param {Number} height 
    */
   setDimensions(width,height){
-    this.obj.rshape=[width,height,4]
+    this.special=['tex',width,height,4]
   }
   /**
    * Gets rotation angle

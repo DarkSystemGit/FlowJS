@@ -227,7 +227,25 @@ export class Engine {
             this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
             this.ctx.fill();
-          } else {
+          } else if(item.special && item.special[0] == "tex"){
+            var tmpCanvas = Canvas.createCanvas( item.special[1],
+              item.special[2]);
+            var tmpCtx = tmpCanvas.getContext("2d");
+            tmpCtx.putImageData(
+              item.pixels,
+              0,
+              0,
+              0,
+              0,
+              item.special[1],
+              item.special[2]
+            );
+            this.ctx.drawImage(
+              tmpCanvas,
+              item.x + -1 * this.camera[0],
+              item.y + -1 * this.camera[1]
+            );
+          }else {
             this.ctx.drawImage(
               createImageBitmap(item.pixels, ...item.shape),
               item.x + -1 * this.camera[0],
