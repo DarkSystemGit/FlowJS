@@ -228,6 +228,7 @@ export class Engine {
             this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
             this.ctx.fill();
           } else if(item.special && item.special[0] == "tex"){
+            
             var tmpCanvas = Canvas.createCanvas( item.special[1],
               item.special[2]);
             var tmpCtx = tmpCanvas.getContext("2d");
