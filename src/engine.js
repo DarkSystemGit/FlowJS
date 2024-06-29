@@ -1,19 +1,17 @@
-import sdl from "@kmamal/sdl";
 import Canvas from "canvas";
 import classMethods from "class-methods";
 import util from "node:util";
 import { GFX } from "./gfx.js";
 import {
-  indexesOf,
   createImageBitmap,
   colliding,
   angle,
   getPixels,
-  mousePressed,
 } from "./utils.js";
 import brc from "fast-brc";
 import { readFile } from "node:fs/promises";
 import { Texture } from "./texture.js";
+import { Renderer } from "./renderer.js";
 
 export class Engine {
   /**
@@ -26,22 +24,11 @@ export class Engine {
    */
   constructor(handlerClass, dimensions, title, scale) {
     return (async () => {
-      const window = (this.window = sdl.video.createWindow({
-        resizable: true,
-        accelerated: true,
-        title,
-        width: dimensions[0],
-        height: dimensions[1],
-      }));
+      const window = (this.window = new Renderer(title,dimensions,scale||[1,1]));
       this.events = { keyboard: {}, mouse: {} };
       this.canvas = Canvas.createCanvas(...dimensions);
       this.ctx = this.canvas.getContext("2d");
       this.scale = scale || [1, 1];
-      this.screenCanvas = Canvas.createCanvas(
-        dimensions[0] * this.scale[0],
-        dimensions[1] * this.scale[1]
-      );
-      this.screenCtx = this.screenCanvas.getContext("2d");
       this.dimensions = dimensions;
       this.uuid = 0;
       this.objects = new Map();
@@ -70,13 +57,6 @@ export class Engine {
         this._handleEvents();
         this.onFrame(this);
         await this._drawObjects();
-
-        this.screenCtx.clearRect(
-          0,
-          0,
-          this.screenCanvas.width,
-          this.screenCanvas.height
-        );
         var gameCanvas = this.ctx.getImageData(
           0,
           0,
@@ -97,23 +77,9 @@ export class Engine {
           }
           gameCanvas = Canvas.createImageData(data, this.canvas.width);
         }
-        this.screenCtx.putImageData(
-          gameCanvas,
-          0,
-          0,
-          0,
-          0,
-          this.canvas.width * this.scale[0],
-          this.canvas.height * this.scale[1]
-        );
-        if (window.destroyed) {
-          return;
-        }
+        
         window.render(
-          ...this.dimensions,
-          this.dimensions[0] * 4,
-          "bgra32",
-          this.screenCanvas.toBuffer("raw")
+          gameCanvas
         );
         setTimeout(gameLoop, 0);
       };
@@ -335,15 +301,11 @@ export class Engine {
   /** Internal method to handle events*/
   _handleEvents() {
     var events = this.events;
-    var keys = sdl.keyboard.getState();
-    this.mouse.push({
-      x: sdl.mouse.position.x - this.window.x,
-      y: sdl.mouse.position.y - this.window.y,
-    });
-    if (mousePressed()) this.mouseClicks.push(Date.now());
-    if (!(indexesOf(keys, true).map((i) => sdl.keyboard.getKey(i)).length == 0))
+    this.mouse.push(this.window.getMousePos());
+    if (this.window.mousePressed()) this.mouseClicks.push(Date.now());
+    if (!(this.window.getPressedKeys().length == 0))
       this.keyboard.push([
-        indexesOf(keys, true).map((i) => sdl.keyboard.getKey(i)),
+        this.window.getPressedKeys(),
         Date.now(),
       ]);
 
@@ -355,12 +317,12 @@ export class Engine {
     ) {
       Object.keys(events.keyboard).forEach((key) => {
         if (
-          keys[sdl.keyboard.SCANCODE[sdl.keyboard.getScancode(key)]] ||
-          (key == "*" && keys.includes(true))
+          this.window.keyPressed(key) ||
+          (key == "*" && (this.window.getPressedKeys().length>0))
         ) {
           events.keyboard[key].forEach((f) => {
             if (key == "*")
-              key = indexesOf(keys, true).map((i) => sdl.keyboard.getKey(i));
+              key = this.window.getPressedKeys();
             f(key, this);
           });
         }
@@ -369,7 +331,7 @@ export class Engine {
     Object.keys(events.mouse).forEach((ev) => {
       if (
         (["left", "right", "middle"].includes(ev) &&
-          sdl.mouse.getButton(sdl.mouse.BUTTON[ev.toUpperCase()])) ||
+          this.window.mouseButtonPressed(ev)) ||
         (ev == "*" &&
           (mousePressed() ||
             !util.isDeepStrictEqual(

@@ -1,5 +1,4 @@
 import { getFormat } from "@unpic/pixels";
-import sdl from "@kmamal/sdl";
 import Canvas from "canvas";
 import jpeg from "jpeg-js";
 import { PNG } from "pngjs";
@@ -31,17 +30,6 @@ export const getPixels = async (file) => {
     shape: [pix.width, pix.height],
     data: Uint8ClampedArray.from(pix.data),
   };
-};export const mousePressed = () => {
-  for (var i = 0; i < 2; i++) {
-    if (sdl.mouse.getButton(
-      [
-        sdl.mouse.BUTTON.LEFT,
-        sdl.mouse.BUTTON.RIGHT,
-        sdl.mouse.BUTTON.MIDDLE,
-      ][i]
-    ))
-      return true;
-  }
 };
 export const indexesOf = (arr, item) => arr.reduce((acc, v, i) => (v === item && acc.push(i), acc), []);
 
