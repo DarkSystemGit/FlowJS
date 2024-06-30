@@ -30,7 +30,7 @@ class Game {
    * @returns {Number} Sprite id
   */
   addSprite(sprite){
-    this.sprites.push(sprite)
+    this.sprites.push(new (sprite)(this))
     return this.sprites.length-1
   }
   /**

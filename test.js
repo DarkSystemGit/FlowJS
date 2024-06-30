@@ -17,7 +17,7 @@ class MyGame extends flow.Game {
     await this.engine.loadAsset(path.join(cwd(), "test.png"), "mario");
     await this.engine.loadAsset(path.join(cwd(), "background.jpeg"), "marioBg");
     this.gfx.fillScreen([0, 0, 255, 255]);
-    this.addSprite(new Mario(this));
+    this.addSprite(Mario);
     var bg=this.gfx.getTexture("marioBg")
     bg.setDimensions(1280,720)
     this.gfx.setLayerBackground(0,bg)

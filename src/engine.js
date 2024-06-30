@@ -99,7 +99,7 @@ export class Engine {
    * @returns {Array<String>}
    */
   listAssets() {
-    return this.assets.listTextures();
+    return this.assets.listAssets();
   }
   /**
    * Sets the game shader
@@ -111,7 +111,7 @@ export class Engine {
    * @param {String} name Name of asset
    */
   removeAsset(name) {
-    this.assets.removeTexture(name);
+    this.assets.removeAsset(name);
   }
   /**
    * Converts a loaded asset to a texture
@@ -387,6 +387,17 @@ export class AssetManager {
   constructor() {
     this.assets = {};
   }
+   /**
+   * Loads a audio stream
+   * @param {String} file File Path
+   * @param {String} name Asset Name
+   * @returns {Object} Asset
+   */
+  async loadAudio(file,name){
+    var f=await readFile(file);
+    this.assets[name] = {type:'audio',data:f};
+    return this.assets[name];
+  }
   /**
    * Loads a texture
    * @param {String} file File Path
@@ -396,6 +407,7 @@ export class AssetManager {
   async loadTexture(file, name) {
     file = await readFile(file);
     var f = await getPixels(file);
+    f.type='texture'
     this.assets[name] = f;
     return this.assets[name];
   }
@@ -403,7 +415,7 @@ export class AssetManager {
    * Deletes a texture from storage
    * @param {String} name Asset Name
    */
-  removeTexture(name) {
+  removeAsset(name) {
     delete this.assets[name];
   }
   /**
@@ -412,6 +424,7 @@ export class AssetManager {
    * @returns
    */
   getTexture(name) {
+    if(pixels.type!='texture')throw new Error(`The asset ${name} is not a texture.`)
     return new Texture(
       ...this.assets[name].shape,
       brc({
@@ -426,7 +439,7 @@ export class AssetManager {
    * List loaded assets
    * @returns {Array<String>} Asset Names
    */
-  listTextures() {
+  listAssets() {
     return Object.keys(this.assets);
   }
 }
