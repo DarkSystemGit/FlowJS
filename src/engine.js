@@ -9,6 +9,7 @@ import {
   getPixels,
 } from "./utils.js";
 import brc from "fast-brc";
+import process from 'process'
 import { readFile } from "node:fs/promises";
 import { Texture } from "./texture.js";
 import { Renderer } from "./renderer.js";
@@ -81,9 +82,9 @@ export class Engine {
         window.render(
           gameCanvas
         );
-        setTimeout(gameLoop, 0);
+        setImmediate(gameLoop)
       };
-      setTimeout(gameLoop, 0);
+      setImmediate(gameLoop)
       return this;
     })();
   }
@@ -424,7 +425,7 @@ export class AssetManager {
    * @returns
    */
   getTexture(name) {
-    if(pixels.type!='texture')throw new Error(`The asset ${name} is not a texture.`)
+    if(this.assets[name].type!='texture')throw new Error(`The asset ${name} is not a texture.`)
     return new Texture(
       ...this.assets[name].shape,
       brc({
