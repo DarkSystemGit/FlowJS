@@ -1,6 +1,3 @@
-import player from 'audio-play'
-import loader from 'audio-loader'
-var mario=await loader('./audio.wav')
-var coin=await loader('./coin.wav')
-player(mario)
-setTimeout(()=>player(coin),5000)
+import { Worker, MessageChannel } from 'worker_threads'
+import path from 'path'
+const worker=new Worker(path.join(import.meta.dirname,'./audio.js'))
