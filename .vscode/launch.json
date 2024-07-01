@@ -5,8 +5,9 @@
     "version": "0.2.0",
     "configurations": [        
         {
-            "name": "Launch Program GPGPU",
-            "program": "${workspaceFolder}/lib/gpgpu/lib/test.mjs",
+            "name": "Launch Program Audio",
+            "runtimeExecutable": "/Users/darksystem/.local/share/nvm/v20.15.0/bin/node",
+            "program": "${workspaceFolder}/src/audio.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
@@ -18,6 +19,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
+            "runtimeExecutable": "/Users/darksystem/.local/share/nvm/v20.15.0/bin/node",
             "skipFiles": [
                 "<node_internals>/**"
             ],

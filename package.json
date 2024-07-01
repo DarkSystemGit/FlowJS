@@ -18,12 +18,15 @@
   "dependencies": {
     "@kmamal/sdl": "^0.10.7",
     "@unpic/pixels": "^1.2.2",
+    "audio-loader": "^1.0.3",
+    "audio-play": "^2.3.1",
     "canvas": "^2.11.2",
     "class-methods": "^1.0.12",
     "fast-brc": "^0.0.1",
     "jpeg-js": "^0.4.4",
     "naudiodon": "^2.3.6",
-    "pngjs": "^7.0.0"
+    "pngjs": "^7.0.0",
+    "speaker": "^0.5.5"
   },
   "devDependencies": {
     "typescript": "^5.4.5"
