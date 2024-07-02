@@ -60,5 +60,5 @@ export class AudioManager{
     stop(id){this.pause(id)}
 }
 const genUUID = () => crypto.randomBytes(16).toString("hex");
-var audio=new AudioManager()
+
 
