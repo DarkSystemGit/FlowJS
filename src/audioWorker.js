@@ -14,6 +14,7 @@ class AudioManager {
       player(this.assets[msg.name], {
         volume: msg.volume / 100 || 1,
         rate: msg.rate || 1,
+        loop: msg.loop||false
       })
     );
   }

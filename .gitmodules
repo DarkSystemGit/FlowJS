@@ -1,3 +1,0 @@
-[submodule "lib/gpgpu"]
-	path = lib/gpgpu
-	url = https://github.com/minodisk/gpgpu.git

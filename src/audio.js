@@ -38,12 +38,13 @@ export class AudioManager {
    * Plays a track
    * @param {String} name Track Name
    * @param {Number} volume Volume (1-100)
+   * @param {Boolean} loop Loop Track
    * @param {Number} rate Playback Rate
    * @returns {Number} Track ID
    */
-  async play(name, volume, rate) {
+  async play(name, volume, loop, rate) {
     try {
-      return await this.ipc.send("playTrack", { name, volume, rate });
+      return await this.ipc.send("playTrack", { name, volume, rate, loop });
     } catch {
       err(`Error while playing: ${name}`);
     }

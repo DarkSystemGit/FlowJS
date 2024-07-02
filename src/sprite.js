@@ -11,7 +11,10 @@ export class Sprite {
     this.audio = game.audio;
     this.camera = game.camera;
     this.obj = { x: 0, y: 0, z: 0 };
+    this.position = { x: 0, y: 0 };
     this.velocity = [0, 0];
+    this.width = 0;
+    this.height = 0;
     var events = ["onMouseLeft", "onMouseMove", "onMouseRight", "onKeyPress"];
     classMethods(this).forEach((m) =>
       game._rEv(m, (...args) => this[m](...args))
@@ -43,6 +46,23 @@ export class Sprite {
     this.onCreate();
   }
   /**
+   * Checks if the sprite is touching in a range
+   * @param {Number} width
+   * @param {Number} height
+   * @param {Number} minw
+   * @param {Number} minh
+   * @returns {Boolean}
+   */
+  touchingRange(width, height, minw, minh) {
+    try{
+    return (
+      this.position.x > width - this.width ||
+      this.position.x < (minw || 0) ||
+      this.position.y > height - this.height ||
+      this.position.y < (minh || 0)
+    );}catch{err('Invalid Parameters')}
+  }
+  /**
    * Loads a texture
    * @param {String|Texture} texture Asset or Texture to load
    */
@@ -50,6 +70,8 @@ export class Sprite {
     try {
       if (typeof texture == "string")
         var ntexture = this.engine.convertAssetToTexture(texture);
+      else var ntexture = texture;
+      this.texture = ntexture;
       if (this.id)
         this.engine.changeObject(this.id, {
           pixels: Canvas.createImageData(
@@ -57,7 +79,8 @@ export class Sprite {
             ...this.texture.getShape()
           ),
         });
-      this.texture = ntexture;
+      this.width = ntexture.getShape()[0];
+      this.height = ntexture.getShape()[1];
     } catch {
       err(`Error: Invalid texture`);
     }
@@ -68,6 +91,7 @@ export class Sprite {
   render() {
     this.obj.x += this.velocity[0];
     this.obj.y += this.velocity[1];
+    this.position = { x: this.obj.x, y: this.obj.y };
     if (this.onFrame && this.id) this.onFrame();
     if (!this.id) {
       this.id = this.gfx.draw(this.obj.x, this.obj.y, this.obj.z, this.texture);
