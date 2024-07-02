@@ -11,8 +11,12 @@ export class Game {
   constructor(gfx, engine) {
     this.gfx = gfx;
     this.engine = engine;
-    this.audio=engine.audio
-    this.camera = { setPosition: (x, y) => this.engine.setCameraPosition(), getPosition: () => this.engine.getCameraPosition(), move: (x, y) => this.engine.moveCamera(x, y) };
+    this.audio = engine.audio;
+    this.camera = {
+      setPosition: (x, y) => this.engine.setCameraPosition(),
+      getPosition: () => this.engine.getCameraPosition(),
+      move: (x, y) => this.engine.moveCamera(x, y),
+    };
     this.sprites = [];
     if (this.shader) this.engine.setShaderFunc(this.shader);
   }
@@ -20,16 +24,20 @@ export class Game {
    * Called on each frame
    */
   _onFrame() {
-    this.sprites.forEach((s) => s ? s.render() : undefined);
-    (this.onFrame || (() => { }))();
+    this.sprites.forEach((s) => (s ? s.render() : undefined));
+    (this.onFrame || (() => {}))();
   }
   /** Adds a Sprite to be drawn
    * @param {Sprite} sprite
    * @returns {Number} Sprite id
-  */
+   */
   addSprite(sprite) {
-    this.sprites.push(new (sprite)(this));
-    return this.sprites.length - 1;
+    try {
+      this.sprites.push(new sprite(this));
+      return this.sprites.length - 1;
+    } catch {
+      err(`Error while adding sprite`);
+    }
   }
   /**
    * Removes a sprite

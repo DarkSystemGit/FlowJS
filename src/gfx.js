@@ -39,7 +39,11 @@ export class GFX {
    *  @param {number} newPosition.z Z Cord
    */
   moveObject(id, newPosition) {
-    this.engine.changeObject(id, newPosition);
+    try {
+      this.engine.changeObject(id, newPosition);
+    } catch {
+      err(`Error while moving object`);
+    }
   }
   /**
    * Gets an objects data
@@ -47,8 +51,12 @@ export class GFX {
    * @returns {object}
    */
   getObject(id) {
-    var obj = this.engine._getObject(id);
-    return { x: obj.x, y: obj.y, z: obj.z, angle: obj.rotation };
+    try {
+      var obj = this.engine._getObject(id);
+      return { x: obj.x, y: obj.y, z: obj.z, angle: obj.rotation };
+    } catch {
+      err(`Error while getting object`);
+    }
   }
   /**
    * Changes an object's texture
@@ -56,9 +64,16 @@ export class GFX {
    * @param {Texture|PixelArray} texture New Texture
    */
   changeObjectTexture(id, texture) {
-    this.engine.changeObject(id, {
-      pixels: Canvas.createImageData(texture._getData(), ...texture.getShape()),
-    });
+    try {
+      this.engine.changeObject(id, {
+        pixels: Canvas.createImageData(
+          texture._getData(),
+          ...texture.getShape()
+        ),
+      });
+    } catch {
+      err(`Error while changing object texture`);
+    }
   }
   /**
    * Rotates a object
@@ -66,37 +81,50 @@ export class GFX {
    * @param {number} degrees Rotation Angle
    */
   rotateObject(id, degrees) {
-    this.engine.changeObject(id, { rotation: degrees });
+    try {
+      this.engine.changeObject(id, { rotation: degrees });
+    } catch {
+      err(`Error while rotating object texture`);
+    }
   }
   /**
    * Fills the screen with a color
    * @param {Array<number>} color RGBA color
    */
   fillScreen(color) {
-    this.engine._clear();
-    var fill = new PixelArray(
-      this.engine.canvas.width,
-      this.engine.canvas.height
-    );
-    fill.fill(color || [0, 0, 0, 255]);
-    this.draw(0, 0, -Infinity, fill, ["fs", color]);
+    try {
+      this.engine._clear();
+      var fill = new PixelArray(
+        this.engine.canvas.width,
+        this.engine.canvas.height
+      );
+      fill.fill(color || [0, 0, 0, 255]);
+      this.draw(0, 0, -Infinity, fill, ["fs", color]);
+    } catch {
+      err(`Error while filling screen`);
+    }
   }
-  /** Gets an asset's texture 
+  /** Gets an asset's texture
    * @param {String} texture
    * @returns {Texture} Asset texture
-  */
-  getTexture(texture){return this.engine.convertAssetToTexture(texture);}
+   */
+  getTexture(texture) {
+    try {
+      return this.engine.convertAssetToTexture(texture);
+    } catch {
+      err(`Error while getting texture`);
+    }
+  }
   /**
    * Sets layer background
    * @param {Texture|String} texture
    */
   setLayerBackground(layer, texture) {
-    if (typeof texture == "string")
-      texture = this.engine.convertAssetToTexture(texture);
-    this.engine.objects.set(layer, this.engine.objects.get(layer) || []);
-    this.engine.objects
-      .get(layer)
-      .unshift({
+    try {
+      if (typeof texture == "string")
+        texture = this.engine.convertAssetToTexture(texture);
+      this.engine.objects.set(layer, this.engine.objects.get(layer) || []);
+      this.engine.objects.get(layer).unshift({
         pixels: Canvas.createImageData(
           texture._getData(),
           ...texture.getShape()
@@ -108,6 +136,9 @@ export class GFX {
         rotation: 0,
         special: texture.special,
       });
+    } catch {
+      err(`Error while setting layer background`);
+    }
   }
   /**
    * Update engine instance

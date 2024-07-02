@@ -1,6 +1,6 @@
 import Canvas from "canvas";
 import classMethods from "class-methods";
-
+import { err } from "./utils.js";
 export class Sprite {
   /**
    * @param {Game} game
@@ -8,14 +8,16 @@ export class Sprite {
   constructor(game) {
     this.gfx = game.gfx;
     this.engine = game.engine;
-    this.audio=game.audio
-    this.camera=game.camera
+    this.audio = game.audio;
+    this.camera = game.camera;
     this.obj = { x: 0, y: 0, z: 0 };
     this.velocity = [0, 0];
     var events = ["onMouseLeft", "onMouseMove", "onMouseRight", "onKeyPress"];
-    classMethods(this).forEach((m) => game._rEv(m, (...args)=>this[m](...args)));
+    classMethods(this).forEach((m) =>
+      game._rEv(m, (...args) => this[m](...args))
+    );
     events.forEach((e) => {
-      if (this[e]) game._rEv(e, (...args)=>this[e](...args));
+      if (this[e]) game._rEv(e, (...args) => this[e](...args));
     });
     var inRange = (x, y, width, height) => {
       var mouse = Object.values(
@@ -45,19 +47,23 @@ export class Sprite {
    * @param {String|Texture} texture Asset or Texture to load
    */
   loadTexture(texture) {
-    if (typeof texture == "string")
-      var ntexture = this.engine.convertAssetToTexture(texture);
-    if (this.id)
-      this.engine.changeObject(this.id, {
-        pixels: Canvas.createImageData(
-          this.texture._getData(),
-          ...this.texture.getShape()
-        ),
-      });
-    this.texture = ntexture;
+    try {
+      if (typeof texture == "string")
+        var ntexture = this.engine.convertAssetToTexture(texture);
+      if (this.id)
+        this.engine.changeObject(this.id, {
+          pixels: Canvas.createImageData(
+            this.texture._getData(),
+            ...this.texture.getShape()
+          ),
+        });
+      this.texture = ntexture;
+    } catch {
+      err(`Error: Invalid texture`);
+    }
   }
   /**
-   * Renders the spriteto the screen
+   * Renders the sprite to the screen
    */
   render() {
     this.obj.x += this.velocity[0];
@@ -75,7 +81,11 @@ export class Sprite {
    * @param {Object} newObj
    */
   changeSprite(newObj) {
-    Object.keys(newObj).forEach((k) => (this.obj[k] = newObj[k]));
+    try {
+      Object.keys(newObj).forEach((k) => (this.obj[k] = newObj[k]));
+    } catch {
+      err("Error while changing sprite");
+    }
   }
   /**
    * Moves a sprite to a x,y position
@@ -83,7 +93,11 @@ export class Sprite {
    * @param {Number} y
    */
   move(x, y) {
-    this.changeSprite({ x: this.obj.x + x, y: this.obj.y + y });
+    try {
+      this.changeSprite({ x: this.obj.x + x, y: this.obj.y + y });
+    } catch {
+      err("Error when moving sprite");
+    }
   }
   /**
    * Rotates a sprite
@@ -113,6 +127,10 @@ export class Sprite {
    * @returns {Array<Object>}
    */
   getCollisions() {
-    return this.engine.getObjectCollisions(this.id);
+    try {
+      return this.engine.getObjectCollisions(this.id);
+    } catch {
+      err("Error when getting collisions");
+    }
   }
 }

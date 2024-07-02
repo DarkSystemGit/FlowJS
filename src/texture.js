@@ -1,4 +1,4 @@
-import { processArr,clone } from "./utils.js";
+import { processArr, clone } from "./utils.js";
 
 export class PixelArray {
   constructor(w, h, data) {
@@ -54,11 +54,11 @@ export class Texture extends PixelArray {
   }
   /**
    * Resizes a texture to a specific size
-   * @param {Number} width 
-   * @param {Number} height 
+   * @param {Number} width
+   * @param {Number} height
    */
-  setDimensions(width,height){
-    this.special=['tex',width,height,4]
+  setDimensions(width, height) {
+    this.special = ["tex", width, height, 4];
   }
   /**
    * Gets rotation angle

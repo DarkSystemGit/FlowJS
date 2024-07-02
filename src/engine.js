@@ -173,13 +173,17 @@ export class Engine {
    * @returns {Number} Object ID
    */
   draw(pixels, x, y, z, shape, angle, oldid, special) {
-    var id = oldid || JSON.parse(JSON.stringify(this.uuid));
-    this.objects.set(z, this.objects.get(z) || []);
-    this.objects
-      .get(z)
-      .push({ x, y, z, pixels, shape, id, rotation: angle || 0, special });
-    if (!oldid) this.uuid++;
-    return id;
+    try {
+      var id = oldid || JSON.parse(JSON.stringify(this.uuid));
+      this.objects.set(z, this.objects.get(z) || []);
+      this.objects
+        .get(z)
+        .push({ x, y, z, pixels, shape, id, rotation: angle || 0, special });
+      if (!oldid) this.uuid++;
+      return id;
+    } catch {
+      err(`Error while drawing object`);
+    }
   }
   /**
    *  Changes an object
@@ -403,7 +407,11 @@ export class AssetManager {
    * @returns {Object} Asset
    */
   async loadAudio(file, name) {
-    return await this.audio._loadAudio(file, name);
+    try {
+      return await this.audio._loadAudio(file, name);
+    } catch {
+      err(`Error while loading asset: ${name}`);
+    }
   }
   /**
    * Loads a texture
@@ -412,18 +420,26 @@ export class AssetManager {
    * @returns {Object} Asset
    */
   async loadTexture(file, name) {
-    file = await readFile(file);
-    var f = await getPixels(file);
-    f.type = "texture";
-    this.assets[name] = f;
-    return this.assets[name];
+    try {
+      file = await readFile(file);
+      var f = await getPixels(file);
+      f.type = "texture";
+      this.assets[name] = f;
+      return this.assets[name];
+    } catch {
+      err(`Error while loading asset: ${name}`);
+    }
   }
   /**
    * Deletes a texture from storage
    * @param {String} name Asset Name
    */
   removeAsset(name) {
-    if (this.assets[name]) delete this.assets[name];
+    try {
+      if (this.assets[name]) delete this.assets[name];
+    } catch {
+      err(`Error while removing asset: ${name}`);
+    }
   }
   /**
    * Gets a texture

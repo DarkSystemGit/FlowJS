@@ -22,7 +22,7 @@ class MyGame extends flow.Game {
     var bg=this.gfx.getTexture("marioBg")
     bg.setDimensions(1280,720)
     this.gfx.setLayerBackground(0,bg)
-    this.audio.play('marioTrack')
+    this.audio.play('marioTrack',200)
   }
   
 }
