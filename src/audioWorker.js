@@ -1,23 +1,31 @@
-import player from 'audio-play'
-import loader from 'audio-loader'
-import {parentPort} from 'node:worker_threads'
-class AudioManager{
-  constructor(){
-    this.assets={}
-    this.playing=[]
+import player from "audio-play";
+import loader from "audio-loader";
+import { parentPort } from "node:worker_threads";
+class AudioManager {
+  constructor() {
+    this.assets = {};
+    this.playing = [];
   }
-  async loadTrack(msg){
-    this.assets[msg.name]=await loader(msg.path)
+  async loadTrack(msg) {
+    this.assets[msg.name] = await loader(msg.path);
   }
-  playTrack(msg){
-    return this.playing.push(player(this.assets[msg.name],{volume:msg.volume/100||1,rate:msg.rate||1}))
+  playTrack(msg) {
+    return this.playing.push(
+      player(this.assets[msg.name], {
+        volume: msg.volume / 100 || 1,
+        rate: msg.rate || 1,
+      })
+    );
   }
-  pauseTrack(msg){
-    this.playing[msg.trackId].pause()
+  pauseTrack(msg) {
+    this.playing[msg.trackId].pause();
   }
-  resumeTrack(msg){
-     this.playing[msg.trackId].play()
+  resumeTrack(msg) {
+    this.playing[msg.trackId].play();
   }
 }
-const audio=new AudioManager()
-parentPort.on('message',async (msg)=>{parentPort.postMessage({id:msg.id,res:await audio[msg.type](msg)})})
+const audio = new AudioManager();
+
+parentPort.on("message", async (msg) => {
+  parentPort.postMessage({ id: msg.id, res: await audio[msg.type](msg) });
+});

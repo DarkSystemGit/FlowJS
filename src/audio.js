@@ -17,6 +17,48 @@ class IPC {
     });
   }
 }
+export class AudioManager{
+    constructor(){
+        this.ipc=new IPC()
+    }
+    /**
+     * Loads an audio file
+     * @param {String} path Path to file
+     * @param {String} name File Name
+     */
+    async loadAudio(path,name){
+        await this.ipc.send('loadTrack',{path,name})
+    }
+    /**
+     * Plays a track
+     * @param {String} name Track Name
+     * @param {Number} volume Volume (1-100)
+     * @param {Number} rate Playback Rate
+     * @returns {Number} Track ID
+     */
+    async play(name,volume,rate){
+        return await this.ipc.send('playTrack',{name,volume,rate})
+    }
+    /**
+     * Pauses a playing track
+     * @param {Number} id 
+     */
+    pause(id){
+        this.ipc.send('pauseTrack',{trackId:id})
+    }
+    /**
+     * Resumes a playing track
+     * @param {Number} id 
+     */
+    resume(id){
+        this.ipc.send('pauseTrack',{trackId:id})
+    }
+    /**
+     * Stops a playing track
+     * @param {Number} id 
+     */
+    stop(id){this.pause(id)}
+}
 const genUUID = () => crypto.randomBytes(16).toString("hex");
-const ipc = new IPC();
-console.log(await ipc.send('loadTrack',{name:'mario',path:'audio.wav'}))
+var audio=new AudioManager()
+

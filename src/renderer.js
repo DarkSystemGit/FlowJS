@@ -17,6 +17,7 @@ export class Renderer{
             dimensions[1] * this.scale[1]
           );
           this.screenCtx = this.screenCanvas.getContext("2d");
+          
     }
     render(framebuffer){
       if(this.window.destroyed)process.exit(0)
@@ -35,6 +36,8 @@ export class Renderer{
          framebuffer.width * this.scale[0],
           framebuffer.height * this.scale[1]
         );
+
+        
         this.window.render(
             ...this.dimensions,
             this.dimensions[0] * 4,
