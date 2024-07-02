@@ -22,11 +22,11 @@ export class AudioManager{
         this.ipc=new IPC()
     }
     /**
-     * Loads an audio file
+     * Internal method to load a audio file
      * @param {String} path Path to file
      * @param {String} name File Name
      */
-    async loadAudio(path,name){
+    async _loadAudio(path,name){
         await this.ipc.send('loadTrack',{path,name})
     }
     /**

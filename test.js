@@ -16,11 +16,13 @@ class MyGame extends flow.Game {
   async onCreate() {
     await this.engine.loadAsset(path.join(cwd(), "test.png"), "mario");
     await this.engine.loadAsset(path.join(cwd(), "background.jpeg"), "marioBg");
+    await this.engine.loadAsset(path.join(cwd(), "mario.wav"), "marioTrack");
     this.gfx.fillScreen([0, 0, 255, 255]);
     this.addSprite(Mario);
     var bg=this.gfx.getTexture("marioBg")
     bg.setDimensions(1280,720)
     this.gfx.setLayerBackground(0,bg)
+    this.audio.play('marioTrack')
   }
   
 }

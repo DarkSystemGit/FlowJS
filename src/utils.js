@@ -32,4 +32,4 @@ export const getPixels = async (file) => {
   };
 };
 export const indexesOf = (arr, item) => arr.reduce((acc, v, i) => (v === item && acc.push(i), acc), []);
-
+export const err=(err)=>{throw new Error(err)}

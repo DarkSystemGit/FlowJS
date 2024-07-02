@@ -7,9 +7,11 @@ import {
   colliding,
   angle,
   getPixels,
+  err,
 } from "./utils.js";
+import npath from "path";
 import brc from "fast-brc";
-import process from 'process'
+import { AudioManager } from "./audio.js";
 import { readFile } from "node:fs/promises";
 import { Texture } from "./texture.js";
 import { Renderer } from "./renderer.js";
@@ -25,7 +27,11 @@ export class Engine {
    */
   constructor(handlerClass, dimensions, title, scale) {
     return (async () => {
-      const window = (this.window = new Renderer(title,dimensions,scale||[1,1]));
+      const window = (this.window = new Renderer(
+        title,
+        dimensions,
+        scale || [1, 1]
+      ));
       this.events = { keyboard: {}, mouse: {} };
       this.canvas = Canvas.createCanvas(...dimensions);
       this.ctx = this.canvas.getContext("2d");
@@ -35,11 +41,11 @@ export class Engine {
       this.objects = new Map();
       this.mouse = [];
       this.mouseClicks = [];
-      this.shaders = [
-      ];
+      this.shaders = [];
       this.camera = [0, 0];
       this.keyboard = [[0, 0]];
-      this.assets = new AssetManager();
+      this.audio = new AudioManager();
+      this.assets = new AssetManager(this.audio);
       var handler = new handlerClass(new GFX(this), this);
       classMethods(handlerClass).forEach((method) => {
         if (!["onCreate", "onFrame"].includes(method)) {
@@ -78,13 +84,11 @@ export class Engine {
           }
           gameCanvas = Canvas.createImageData(data, this.canvas.width);
         }
-        
-        window.render(
-          gameCanvas
-        );
-        setImmediate(gameLoop)
+
+        window.render(gameCanvas);
+        setImmediate(gameLoop);
       };
-      setImmediate(gameLoop)
+      setImmediate(gameLoop);
       return this;
     })();
   }
@@ -94,7 +98,11 @@ export class Engine {
    * @param {String} name Name of asset
    */
   async loadAsset(path, name) {
-    await this.assets.loadTexture(path, name);
+    if ([".wav", ".mp3", ".ogg"].includes(npath.extname(path)))
+      return await this.assets.loadAudio(path, name);
+    if ([".png", ".jpeg"].includes(npath.extname(path)))
+      return await this.assets.loadTexture(path, name);
+    err("Invalid asset type, " + npath.extname(path).replace(".", ""));
   }
   /** Lists loaded assets
    * @returns {Array<String>}
@@ -104,9 +112,11 @@ export class Engine {
   }
   /**
    * Sets the game shader
-   * @param {Function} shader 
+   * @param {Function} shader
    */
-  setShaderFunc(shader){this.shaders[0]=shader}
+  setShaderFunc(shader) {
+    this.shaders[0] = shader;
+  }
   /**
    * Removes an asset from storage
    * @param {String} name Name of asset
@@ -228,10 +238,11 @@ export class Engine {
             this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
             this.ctx.fill();
-          } else if(item.special && item.special[0] == "tex"){
-            
-            var tmpCanvas = Canvas.createCanvas( item.special[1],
-              item.special[2]);
+          } else if (item.special && item.special[0] == "tex") {
+            var tmpCanvas = Canvas.createCanvas(
+              item.special[1],
+              item.special[2]
+            );
             var tmpCtx = tmpCanvas.getContext("2d");
             tmpCtx.putImageData(
               item.pixels,
@@ -247,7 +258,7 @@ export class Engine {
               item.x + -1 * this.camera[0],
               item.y + -1 * this.camera[1]
             );
-          }else {
+          } else {
             this.ctx.drawImage(
               createImageBitmap(item.pixels, ...item.shape),
               item.x + -1 * this.camera[0],
@@ -324,10 +335,7 @@ export class Engine {
     this.mouse.push(this.window.getMousePos());
     if (this.window.mousePressed()) this.mouseClicks.push(Date.now());
     if (!(this.window.getPressedKeys().length == 0))
-      this.keyboard.push([
-        this.window.getPressedKeys(),
-        Date.now(),
-      ]);
+      this.keyboard.push([this.window.getPressedKeys(), Date.now()]);
 
     if (
       this.keyboard.length > 1 &&
@@ -338,11 +346,10 @@ export class Engine {
       Object.keys(events.keyboard).forEach((key) => {
         if (
           this.window.keyPressed(key) ||
-          (key == "*" && (this.window.getPressedKeys().length>0))
+          (key == "*" && this.window.getPressedKeys().length > 0)
         ) {
           events.keyboard[key].forEach((f) => {
-            if (key == "*")
-              key = this.window.getPressedKeys();
+            if (key == "*") key = this.window.getPressedKeys();
             f(key, this);
           });
         }
@@ -385,19 +392,18 @@ export class Engine {
 }
 export class AssetManager {
   /** Internal class to manage asssets */
-  constructor() {
+  constructor(aud) {
     this.assets = {};
+    this.audio = aud;
   }
-   /**
+  /**
    * Loads a audio stream
    * @param {String} file File Path
    * @param {String} name Asset Name
    * @returns {Object} Asset
    */
-  async loadAudio(file,name){
-    var f=await readFile(file);
-    this.assets[name] = {type:'audio',data:f};
-    return this.assets[name];
+  async loadAudio(file, name) {
+    return await this.audio._loadAudio(file, name);
   }
   /**
    * Loads a texture
@@ -408,7 +414,7 @@ export class AssetManager {
   async loadTexture(file, name) {
     file = await readFile(file);
     var f = await getPixels(file);
-    f.type='texture'
+    f.type = "texture";
     this.assets[name] = f;
     return this.assets[name];
   }
@@ -417,7 +423,7 @@ export class AssetManager {
    * @param {String} name Asset Name
    */
   removeAsset(name) {
-    delete this.assets[name];
+    if (this.assets[name]) delete this.assets[name];
   }
   /**
    * Gets a texture
@@ -425,7 +431,9 @@ export class AssetManager {
    * @returns
    */
   getTexture(name) {
-    if(this.assets[name].type!='texture')throw new Error(`The asset ${name} is not a texture.`)
+    if (!this.assets[name]) err(`No such texture, ${name}`);
+    if (this.assets[name].type != "texture")
+      throw new Error(`The asset ${name} is not a texture.`);
     return new Texture(
       ...this.assets[name].shape,
       brc({

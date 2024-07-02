@@ -8,6 +8,7 @@ export class Sprite {
   constructor(game) {
     this.gfx = game.gfx;
     this.engine = game.engine;
+    this.audio=game.audio
     this.camera=game.camera
     this.obj = { x: 0, y: 0, z: 0 };
     this.velocity = [0, 0];
