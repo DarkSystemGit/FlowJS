@@ -1,6 +1,6 @@
 import player from 'audio-play'
 import loader from 'audio-loader'
-import {MessageChannel} from 'worker_threads'
+import {parentPort} from 'node:worker_threads'
 class AudioManager{
   constructor(){
     this.assets={}
@@ -19,6 +19,5 @@ class AudioManager{
      this.playing[msg.trackId].play()
   }
 }
-const {response,cmd}=new MessageChannel()
 const audio=new AudioManager()
-cmd.on('message',async (msg)=>response.postMessage({id:msg.id,res:await audio[msg.type](msg)}))
+parentPort.on('message',async (msg)=>{parentPort.postMessage({id:msg.id,res:await audio[msg.type](msg)})})
