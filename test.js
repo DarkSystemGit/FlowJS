@@ -11,11 +11,11 @@ class Mario extends flow.Sprite {
     }
   }
   onKeyPress(key) {
-    if (key[0] == "right" && !(this.position.x > 1280))
+    if (key[0] == "right" && !(this.position.x > 1280-this.width))
       this.changeVelocity(1, 0);
     if (key[0] == "left" && !(this.position.x < 0)) this.changeVelocity(-1, 0);
     if (key[0] == "up" && !(this.position.y < 0)) this.changeVelocity(0, -1);
-    if (key[0] == "down" && !(this.position.y > 720)) this.changeVelocity(0, 1);
+    if (key[0] == "down" && !(this.position.y > 720-this.height)) this.changeVelocity(0, 1);
   }
 }
 class MyGame extends flow.Game {
