@@ -13,7 +13,7 @@ export class GlRenderer {
     uniform sampler2D frame;
     varying vec2 uv;
   void main () {
-    gl_FragColor = texture2D(frame, uv);
+    gl_FragColor = vec4(texture2D(frame, uv).g,texture2D(frame, uv).b,texture2D(frame, uv).a,texture2D(frame, uv).r );
   }`,
       `
   precision mediump float;
@@ -30,7 +30,7 @@ export class GlRenderer {
       attributes:{
         position:[-2,0,0,-2,2,2]
       },
-      uniforms:{frame:()=>this.regl.texture(this.texture),...this.uniforms},
+      uniforms:{frame:()=>this.regl.texture({flipY:true,...this.texture}),...this.uniforms},
       count:3
     })
   }
@@ -54,12 +54,12 @@ export class GlRenderer {
       attributes:{
         position:[-2,0,0,-2,2,2]
       },
-      uniforms:{frame:()=>this.regl.texture(this.texture),...this.uniforms},
+      uniforms:{frame:()=>this.regl.texture({flipY:true,...this.texture}),...this.uniforms},
       count:3
     })
   }
   render(width,height,frame) {
-    this.texture={width,height,data:frame}
+    this.texture={width,height,data:frame.reverse()}
     this.regl.clear({
       color: [0, 0, 0, 1],
       depth: 1,
