@@ -5,15 +5,15 @@ export class GlRenderer {
     this.window=window
     this.gl = gl(window.width,window.height,{window:window.native});
     this.regl = createRegl({ gl: this.gl });
-    this.texture = { width: 0, height: 0, data: null };
+    this.texture = this.regl.texture({ flipY:true,width: 0, height: 0, data: null });
     this.uniforms={}
     this.shaders = [
       `
     precision mediump float;
-    uniform sampler2D frame;
+    uniform sampler2D frame_R;
     varying vec2 uv;
   void main () {
-    gl_FragColor = vec4(texture2D(frame, uv).g,texture2D(frame, uv).b,texture2D(frame, uv).a,texture2D(frame, uv).r );
+    gl_FragColor = vec4(texture2D(frame_R, uv).g,texture2D(frame_R, uv).b,texture2D(frame_R, uv).a,texture2D(frame_R, uv).r );
   }`,
       `
   precision mediump float;
@@ -30,7 +30,7 @@ export class GlRenderer {
       attributes:{
         position:[-2,0,0,-2,2,2]
       },
-      uniforms:{frame:()=>this.regl.texture({flipY:true,...this.texture}),...this.uniforms},
+      uniforms:{frame_R:()=>this.texture,...this.uniforms},
       count:3
     })
   }
@@ -39,6 +39,9 @@ export class GlRenderer {
     precision mediump float;
     uniform sampler2D frame;
     varying vec2 uv;
+    vec4 getPixel(){
+      return vec4(texture2D(frame, uv).g,texture2D(frame, uv).b,texture2D(frame, uv).a,texture2D(frame, uv).r );
+    }
     ${shader}
     `;
     this.recompile();
@@ -54,12 +57,12 @@ export class GlRenderer {
       attributes:{
         position:[-2,0,0,-2,2,2]
       },
-      uniforms:{frame:()=>this.regl.texture({flipY:true,...this.texture}),...this.uniforms},
+      uniforms:{frame_R:()=>this.texture,...this.uniforms},
       count:3
     })
   }
   render(width,height,frame) {
-    this.texture={width,height,data:frame.reverse()}
+    this.texture=this.texture({width,height,data:frame.reverse()})
     this.regl.clear({
       color: [0, 0, 0, 1],
       depth: 1,
