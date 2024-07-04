@@ -46,20 +46,20 @@ export class Sprite {
     this.onCreate();
   }
   /**
-   * Checks if the sprite is touching in a range
+   * Checks if the sprite is in a range
    * @param {Number} width
    * @param {Number} height
-   * @param {Number} minw
-   * @param {Number} minh
+   * @param {Number} minWidth
+   * @param {Number} minHeight
    * @returns {Boolean}
    */
-  touchingRange(width, height, minw, minh) {
+  inBounds(width, height, minWidth, minHeight) {
     try{
-    return (
+    return !(
       this.position.x > width - this.width ||
-      this.position.x < (minw || 0) ||
+      this.position.x < (minWidth || 0) ||
       this.position.y > height - this.height ||
-      this.position.y < (minh || 0)
+      this.position.y < (minHeight || 0)
     );}catch{err('Invalid Parameters')}
   }
   /**

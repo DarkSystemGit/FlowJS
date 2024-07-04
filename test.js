@@ -6,16 +6,19 @@ class Mario extends flow.Sprite {
     this.loadTexture("mario");
   }
   onFrame() {
-    if (this.touchingRange(1280, 720)) {
+    if ((!this.inBounds(1280, 720)&&!(this.position.y < 0))||this.getCollisions().length!=0) {
       this.velocity = [0, 0];
+      this.jumping=false
+    }else{
+      this.changeVelocity(0,.1)
     }
   }
   onKeyPress(key) {
     if (key[0] == "right" && !(this.position.x > 1280-this.width))
-      this.changeVelocity(1, 0);
-    if (key[0] == "left" && !(this.position.x < 0)) this.changeVelocity(-1, 0);
-    if (key[0] == "up" && !(this.position.y < 0)) this.changeVelocity(0, -1);
-    if (key[0] == "down" && !(this.position.y > 720-this.height)) this.changeVelocity(0, 1);
+      this.changeVelocity(.1, 0);
+    if (key[0] == "left" && !(this.position.x < 0)) this.changeVelocity(-.1, 0);
+    if (key[0] == "up" && !(this.position.y < 0) && !this.jumping){ this.changeVelocity(0, -7);this.jumping=true}
+   
   }
 }
 class MyGame extends flow.Game {
