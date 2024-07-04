@@ -62,7 +62,7 @@ export class GlRenderer {
     })
   }
   render(width,height,frame) {
-    this.texture=this.texture({width,height,data:frame.reverse()})
+    this.texture=this.texture({flipY:true,width,height,data:frame.reverse()})
     this.regl.clear({
       color: [0, 0, 0, 1],
       depth: 1,
