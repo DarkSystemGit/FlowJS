@@ -12,6 +12,7 @@ export class GlRenderer {
     precision mediump float;
     uniform sampler2D frame_R;
     varying vec2 uv;
+
   void main () {
     gl_FragColor = vec4(texture2D(frame_R, uv).g,texture2D(frame_R, uv).b,texture2D(frame_R, uv).a,texture2D(frame_R, uv).r );
   }`,
@@ -36,18 +37,18 @@ export class GlRenderer {
   }
   setShader(shader) {
     this.shaders[0] = `
-    precision mediump float;
-    uniform sampler2D frame;
+   precision mediump float;
+    uniform sampler2D frame_R;
     varying vec2 uv;
     vec4 getPixel(){
-      return vec4(texture2D(frame, uv).g,texture2D(frame, uv).b,texture2D(frame, uv).a,texture2D(frame, uv).r );
+      return vec4(texture2D(frame_R, uv).g,texture2D(frame_R, uv).b,texture2D(frame_R, uv).a,texture2D(frame_R, uv).r );
     }
     ${shader}
     `;
     this.recompile();
   }
-  setShaderProperty(name,val){
-    this.uniforms[name]=val
+  setShaderProperty(obj){
+    this.uniforms={...this.uniforms,...obj}
     this.recompile()
   }
   recompile(){

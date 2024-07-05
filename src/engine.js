@@ -8,9 +8,9 @@ import {
   angle,
   getPixels,
   err,
+  brc,
 } from "./utils.js";
 import npath from "path";
-import brc from "fast-brc";
 import { AudioManager } from "./audio.js";
 import { readFile } from "node:fs/promises";
 import { Texture } from "./texture.js";
@@ -64,28 +64,9 @@ export class Engine {
         this._handleEvents();
         this.onFrame(this);
         await this._drawObjects();
-        var gameCanvas = this.ctx.getImageData(
-          0,
-          0,
-          this.canvas.width,
-          this.canvas.height
+        window.render(
+          this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
         );
-        if (this.shaders.length > 0) {
-          var data = new Uint8ClampedArray(gameCanvas.data.length);
-          for (var i = 0; i < gameCanvas.data.length; i = i + 4) {
-            var pix = gameCanvas.data.slice(i, i + 4);
-            pix =
-              this.shaders[0](
-                (i / 4) % this.canvas.width,
-                i / 4 / this.canvas.width,
-                pix
-              ) || pix;
-            data.set(pix, i);
-          }
-          gameCanvas = Canvas.createImageData(data, this.canvas.width);
-        }
-
-        window.render(gameCanvas);
         setImmediate(gameLoop);
       };
       setImmediate(gameLoop);
@@ -102,6 +83,8 @@ export class Engine {
       return await this.assets.loadAudio(path, name);
     if ([".png", ".jpeg"].includes(npath.extname(path)))
       return await this.assets.loadTexture(path, name);
+    if (npath.extname(path) == ".glsl")
+      return await this.assets.loadFile(path, name);
     err("Invalid asset type, " + npath.extname(path).replace(".", ""));
   }
   /** Lists loaded assets
@@ -112,10 +95,16 @@ export class Engine {
   }
   /**
    * Sets the game shader
-   * @param {Function} shader
+   * @param {String} shader Shader asset
+   * @param {Object} props Shader properties
    */
-  setShaderFunc(shader) {
-    this.shaders[0] = shader;
+  setShader(shader, props) {
+    try {
+      this.window.setShader(this.assets.getFile(shader));
+      this.window.setShaderProps(props||{});
+    } catch {
+      err(`Error while setting new shader, ${shader}`);
+    }
   }
   /**
    * Removes an asset from storage
@@ -429,6 +418,28 @@ export class AssetManager {
     } catch {
       err(`Error while loading asset: ${name}`);
     }
+  }
+  /**
+   * Loads a file
+   * @param {String} file File Path
+   * @param {String} name Asset Name
+   * @returns {Object} Asset
+   */
+  async loadFile(file, name) {
+    try {
+      file = await readFile(file);
+      this.assets[name] = { data: file, type: "file" };
+      return this.assets[name];
+    } catch {
+      err(`Error while loading asset: ${name}`);
+    }
+  }
+  /**
+   * Gets a file from storage
+   * @param {String} name file name
+   */
+  getFile(name) {
+    return this.assets[name].data;
   }
   /**
    * Deletes a texture from storage

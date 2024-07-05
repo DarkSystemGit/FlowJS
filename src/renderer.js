@@ -1,6 +1,6 @@
 import sdl from "@kmamal/sdl";
 import Canvas from "canvas";
-import { indexesOf, err } from "./utils.js";
+import { indexesOf} from "./utils.js";
 import { GlRenderer } from "./GlRenderer.js";
 export class Renderer {
   constructor(title, dimensions, scale) {
@@ -21,6 +21,10 @@ export class Renderer {
     this.screenCtx = this.screenCanvas.getContext("2d");
     this.gl=new GlRenderer(this.window)
   }
+  setShader(shader){
+    this.gl.setShader(shader)
+  }
+  setShaderProps(props){this.gl.setShaderProperty(props)}
   render(framebuffer) {
     if (this.window.destroyed) process.exit(0);
     this.screenCtx.clearRect(
