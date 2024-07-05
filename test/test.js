@@ -34,7 +34,7 @@ class MyGame extends flow.Game {
     var bg = this.gfx.getTexture("marioBg");
     bg.setDimensions(1280, 720);
     this.gfx.setLayerBackground(0, bg);
-    this.audio.play('marioTrack',200,true)
+    //this.audio.play('marioTrack',200,true)
   }
 }
 new flow.Engine(MyGame, [1280, 720], "Game");
