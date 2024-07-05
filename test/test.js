@@ -24,7 +24,6 @@ class Mario extends flow.Sprite {
 class MyGame extends flow.Game {
   async onCreate() {
     var dir=(f)=>path.join(path.dirname(import.meta.dirname),'test',f)
-    console.log(dir(''))
     await this.engine.loadAsset(dir( "test.png"), "mario");
     await this.engine.loadAsset(dir( "background.jpeg"), "marioBg");
     await this.engine.loadAsset(dir( "mario.wav"), "marioTrack");
