@@ -1,7 +1,7 @@
 import sdl from "@kmamal/sdl";
 import Canvas from "canvas";
 import { indexesOf} from "./utils.js";
-import { GlRenderer } from "./GlRenderer.js";
+import { GlRenderer } from "./glRenderer.js";
 export class Renderer {
   constructor(title, dimensions, scale) {
     this.dimensions = dimensions;

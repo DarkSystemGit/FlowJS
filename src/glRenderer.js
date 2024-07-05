@@ -6,6 +6,7 @@ export class GlRenderer {
     this.gl = gl(window.width,window.height,{window:window.native});
     this.regl = createRegl({ gl: this.gl });
     this.texture = this.regl.texture({width: 0, height: 0, data: null });
+    this.glx=this.gl.getExtension('STACKGL_resize_drawingbuffer')
     this.uniforms={}
     this.shaders = [
       `
@@ -33,6 +34,11 @@ export class GlRenderer {
       },
       uniforms:{frame_R:()=>this.texture,...this.uniforms},
       count:3
+    })
+    this.window.on('resize', ({ width: w, height: h, pixelWidth: pw, pixelHeight: ph }) => {
+      this.glx.resize(pw, ph)
+      this.gl.viewport(0, 0, w, h)
+      //this.gl.swap()
     })
   }
   //color:bgra
