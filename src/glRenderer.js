@@ -14,7 +14,7 @@ export class GlRenderer {
     varying vec2 uv;
 
   void main () {
-    gl_FragColor = vec4(texture2D(frame_R, uv).g,texture2D(frame_R, uv).b,texture2D(frame_R, uv).a,texture2D(frame_R, uv).r );
+    gl_FragColor = vec4(texture2D(frame_R, uv).b,texture2D(frame_R, uv).g,texture2D(frame_R, uv).r,texture2D(frame_R, uv).a );
   }`,
       `
   precision mediump float;
@@ -44,7 +44,6 @@ export class GlRenderer {
     uniform vec2 viewport;
     vec4 getPixel(){
       return vec4(texture2D(frame_R, uv).b,texture2D(frame_R, uv).g,texture2D(frame_R, uv).r,texture2D(frame_R, uv).a );
-      //vec4(texture2D(frame_R, uv).g,texture2D(frame_R, uv).b,texture2D(frame_R, uv).a,texture2D(frame_R, uv).r );
     }
     vec2 getPosition(){
       return vec2((gl_FragCoord.x/viewport.x),1.00-(gl_FragCoord.y/viewport.y));

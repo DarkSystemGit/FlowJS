@@ -28,7 +28,7 @@ class MyGame extends flow.Game {
     await this.engine.loadAsset(dir( "background.jpeg"), "marioBg");
     await this.engine.loadAsset(dir( "mario.wav"), "marioTrack");
     await this.engine.loadAsset(dir('shader.glsl'),'shader');
-    this.engine.setShader('shader')
+    //this.engine.setShader('shader')
     this.gfx.fillScreen([0, 0, 255, 255]);
     this.addSprite(Mario);
     var bg = this.gfx.getTexture("marioBg");
