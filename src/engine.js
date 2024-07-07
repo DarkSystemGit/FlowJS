@@ -15,16 +15,16 @@ import { AudioManager } from "./audio.js";
 import { readFile } from "node:fs/promises";
 import { Texture } from "./texture.js";
 import { Renderer } from "./renderer.js";
+
 /**
- * @class Engine
- * @description Game Engine
- * @param {Class} handlerClass Game class
- * @param {Array<number>} dimensions Screen dimensions
- * @param {String} title Window Title
- * @param {Number[]} scale Scale factor
+ * The Engine class is the main game engine that manages the game loop, rendering, and other core game systems.
+ * It takes in a game class, screen dimensions, window title, and scale factor to initialize the game.
+ *
+ * @param {Object} game - The game class that will be used to handle game logic.
+ * @returns {Promise<Engine>} A Promise that resolves to the initialized Engine instance.
  */
 export class Engine {
-  constructor(handlerClass, dimensions, title, scale) {
+  constructor(game) {
     /**
      * @property {Renderer} window - The game window
      * @property {Object} events - Event handlers
@@ -44,16 +44,18 @@ export class Engine {
      * @property {Object} utils - Utility functions
      */
     return (async () => {
+      game.window.dimensions=[game.window.width,game.window.height];
+      if(game.window.screen)game.window.screen=[game.window.screen.width/game.window.width,game.window.screen.height/game.window.height];
       const window = (this.window = new Renderer(
-        title,
-        dimensions,
-        scale || [1, 1]
+        game.window.title,
+        game.window.dimensions,
+        game.window.screen || [1, 1]
       ));
       this.events = { keyboard: {}, mouse: {} };
-      this.canvas = Canvas.createCanvas(...dimensions);
+      this.canvas = Canvas.createCanvas(...game.window.dimensions);
       this.ctx = this.canvas.getContext("2d");
-      this.scale = scale || [1, 1];
-      this.dimensions = dimensions;
+      this.scale = game.window.screen || [1, 1];
+      this.dimensions = game.window.dimensions;
       this.uuid = 0;
       this.objects = new Map();
       this.mouse = [];
@@ -68,8 +70,8 @@ export class Engine {
         worldToScreen: (x, y) => this._convertCords(x, y),
       };
       
-      var handler = new handlerClass(new GFX(this), this);
-      classMethods(handlerClass).forEach((method) => {
+      var handler = new game.game(new GFX(this), this);
+      classMethods(game.game).forEach((method) => {
         if (!["onCreate", "onFrame"].includes(method)) {
           if (method == "onKeyPress")
             this._registerEvent("keyboard.*", handler.onKeyPress);
@@ -266,24 +268,12 @@ export class Engine {
               this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
               this.ctx.fill();
             } else if (item.special && item.special[0] == "tex") {
-              var tmpCanvas = Canvas.createCanvas(
-                item.special[1],
-                item.special[2]
-              );
-              var tmpCtx = tmpCanvas.getContext("2d");
-              tmpCtx.putImageData(
-                item.pixels,
-                0,
-                0,
-                0,
-                0,
-                item.special[1],
-                item.special[2]
-              );
               this.ctx.drawImage(
-                tmpCanvas,
+                createImageBitmap(item.pixels, ...item.shape),
                 item.x + -1 * this.camera[0],
-                item.y + -1 * this.camera[1]
+                item.y + -1 * this.camera[1],
+                item.special[1],
+                item.special[2]
               );
             } else {
               this.ctx.drawImage(
@@ -416,8 +406,414 @@ export class Engine {
       }
     });
   }
-}
-export class AssetManager {
+}/**
+ * The Engine class is the main game engine that manages the game loop, rendering, and other core game systems.
+ * It takes in a game class, screen dimensions, window title, and scale factor to initialize the game.
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * The `_drawObjects` method is an internal method of the `Engine` class that is responsible for drawing all the game objects to the canvas. It iterates through the objects in the `objects` map, sorted by their z-axis value, and draws each object to the canvas. The method handles both rotated and non-rotated objects, as well as special cases like full-screen overlays and textures.
+ */export class AssetManager {
   /** Internal class to manage asssets */
   constructor(aud) {
     this.assets = {};

@@ -36,4 +36,4 @@ class MyGame extends flow.Game {
     //this.audio.play('marioTrack',200,true)
   }
 }
-new flow.Engine(MyGame, [1280, 720], "Game");
+new flow.Engine({game:MyGame, window:{width:1280, height:720, title:"Game"}});
