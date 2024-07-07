@@ -4,9 +4,11 @@
   "description": "A Node.JS Game Engine",
   "main": "gfx.js",
   "type": "module",
+  "types": "./types/main.d.ts",
   "scripts": {
     "test": "node ./test/test.js",
-    "start": "node ./test/test.js"
+    "start": "node ./test/test.js",
+    "types": "npx tsc --noEmit false --emitDeclarationOnly true --declaration --declarationDir ./types"
   },
   "keywords": [
     "game",
@@ -28,6 +30,7 @@
     "regl": "^2.1.0"
   },
   "devDependencies": {
+    "@types/node": "^20.14.10",
     "typescript": "^5.4.5"
   }
 }

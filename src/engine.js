@@ -15,17 +15,34 @@ import { AudioManager } from "./audio.js";
 import { readFile } from "node:fs/promises";
 import { Texture } from "./texture.js";
 import { Renderer } from "./renderer.js";
-
+/**
+ * @class Engine
+ * @description Game Engine
+ * @param {Class} handlerClass Game class
+ * @param {Array<number>} dimensions Screen dimensions
+ * @param {String} title Window Title
+ * @param {Number[]} scale Scale factor
+ */
 export class Engine {
-  /**
-   * Game Engine
-   * @param {Class} handlerClass Game class
-   * @param {Array<number>} dimensions Screen dimensions
-   * @param {Number} scale Scale factor
-   * @param {String} title Window Title
-   * @returns
-   */
   constructor(handlerClass, dimensions, title, scale) {
+    /**
+     * @property {Renderer} window - The game window
+     * @property {Object} events - Event handlers
+     * @property {Canvas} canvas - The game canvas
+     * @property {CanvasRenderingContext2D} ctx - The canvas rendering context
+     * @property {Array<number>} scale - The scale factor
+     * @property {Array<number>} dimensions - The screen dimensions
+     * @property {number} uuid - A unique identifier for objects
+     * @property {Map} objects - A map of game objects
+     * @property {Array} mouse - An array of mouse positions
+     * @property {Array} mouseClicks - An array of mouse click timestamps
+     * @property {Array} shaders - An array of shaders
+     * @property {Array<number>} camera - The camera position
+     * @property {Array} keyboard - An array of keyboard inputs
+     * @property {AudioManager} audio - The audio manager
+     * @property {AssetManager} assets - The asset manager
+     * @property {Object} utils - Utility functions
+     */
     return (async () => {
       const window = (this.window = new Renderer(
         title,
@@ -46,6 +63,11 @@ export class Engine {
       this.keyboard = [[0, 0]];
       this.audio = new AudioManager();
       this.assets = new AssetManager(this.audio);
+      this.utils = {
+        screenToWorld: (x, y) => this._convertCords(x, y, true),
+        worldToScreen: (x, y) => this._convertCords(x, y),
+      };
+      
       var handler = new handlerClass(new GFX(this), this);
       classMethods(handlerClass).forEach((method) => {
         if (!["onCreate", "onFrame"].includes(method)) {
@@ -59,6 +81,7 @@ export class Engine {
         }
       });
       this.onFrame = (a) => handler._onFrame(a) || function () {};
+      //very slow,loading screen needed
       await handler.onCreate(this);
       var gameLoop = async () => {
         this._handleEvents();
@@ -101,7 +124,7 @@ export class Engine {
   setShader(shader, props) {
     try {
       this.window.setShader(this.assets.getFile(shader));
-      this.window.setShaderProps(props||{});
+      this.window.setShaderProps(props || {});
     } catch {
       err(`Error while setting new shader, ${shader}`);
     }
@@ -141,6 +164,17 @@ export class Engine {
    */
   getCameraPosition() {
     return this.camera;
+  }
+  /**
+   * Internal method to convert cooridinates from screen to world space, and vice-versa
+   * @param {Number} x
+   * @param {Number} y
+   * @param {Boolean} screen
+   * @returns {Array<number>}
+   */
+  _convertCords(x, y, screen) {
+    if (screen) return [x + -1 * this.camera[0], y + -1 * this.camera[1]];
+    return [x + this.camera[0], y + this.camera[1]];
   }
   /**
    * Moves the camera around
@@ -200,42 +234,20 @@ export class Engine {
       item.id
     );
   }
-  /** Internal method that actually draws to the screen */
-  async _drawObjects() {
-    var zaxis = Array.from(this.objects.keys()).sort((a, b) => a - b);
-    for (var z of zaxis) {
-      for (var item of this.objects.get(z)) {
-        if (!item) continue;
-        if (item.rotation) {
-          this.ctx.save();
-          this.ctx.translate(
-            item.x + item.shape[0] / 2,
-            item.y + item.shape[1] / 2
-          );
-          this.ctx.rotate((Math.PI * item.rotation) / 360);
-          var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
-          var tmpCtx = tmpCanvas.getContext("2d");
-          tmpCtx.putImageData(
-            item.pixels,
-            0,
-            0,
-            0,
-            0,
-            item.shape[0],
-            item.shape[1]
-          );
-          this.ctx.drawImage(tmpCanvas, -item.shape[0] / 2, -item.shape[1] / 2);
-          this.ctx.restore();
-        } else {
-          if (item.special && item.special[0] == "fs") {
-            this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
-            this.ctx.fill();
-          } else if (item.special && item.special[0] == "tex") {
-            var tmpCanvas = Canvas.createCanvas(
-              item.special[1],
-              item.special[2]
+    /** Internal method that actually draws to the screen */
+    async _drawObjects() {
+      var zaxis = Array.from(this.objects.keys()).sort((a, b) => a - b);
+      for (var z of zaxis) {
+        for (var item of this.objects.get(z)) {
+          if (!item) continue;
+          if (item.rotation) {
+            this.ctx.save();
+            this.ctx.translate(
+              item.x + item.shape[0] / 2,
+              item.y + item.shape[1] / 2
             );
+            this.ctx.rotate((Math.PI * item.rotation) / 360);
+            var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
             var tmpCtx = tmpCanvas.getContext("2d");
             tmpCtx.putImageData(
               item.pixels,
@@ -243,29 +255,51 @@ export class Engine {
               0,
               0,
               0,
-              item.special[1],
-              item.special[2]
+              item.shape[0],
+              item.shape[1]
             );
-            this.ctx.drawImage(
-              tmpCanvas,
-              item.x + -1 * this.camera[0],
-              item.y + -1 * this.camera[1]
-            );
+            this.ctx.drawImage(tmpCanvas, -item.shape[0] / 2, -item.shape[1] / 2);
+            this.ctx.restore();
           } else {
-            this.ctx.drawImage(
-              createImageBitmap(item.pixels, ...item.shape),
-              item.x + -1 * this.camera[0],
-              item.y + -1 * this.camera[1]
-            );
+            if (item.special && item.special[0] == "fs") {
+              this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
+              this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
+              this.ctx.fill();
+            } else if (item.special && item.special[0] == "tex") {
+              var tmpCanvas = Canvas.createCanvas(
+                item.special[1],
+                item.special[2]
+              );
+              var tmpCtx = tmpCanvas.getContext("2d");
+              tmpCtx.putImageData(
+                item.pixels,
+                0,
+                0,
+                0,
+                0,
+                item.special[1],
+                item.special[2]
+              );
+              this.ctx.drawImage(
+                tmpCanvas,
+                item.x + -1 * this.camera[0],
+                item.y + -1 * this.camera[1]
+              );
+            } else {
+              this.ctx.drawImage(
+                createImageBitmap(item.pixels, ...item.shape),
+                item.x + -1 * this.camera[0],
+                item.y + -1 * this.camera[1]
+              );
+            }
           }
         }
       }
     }
-  }
   /**
    *  Internal method to get an Object
    * @param {Number} id Object ID
-   * @returns
+   * @returns {Object}
    */
   _getObject(id) {
     var item;
@@ -455,7 +489,7 @@ export class AssetManager {
   /**
    * Gets a texture
    * @param {String} name Asset Name
-   * @returns
+   * @returns {Object} Asset
    */
   getTexture(name) {
     if (!this.assets[name]) err(`No such texture, ${name}`);

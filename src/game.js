@@ -1,3 +1,7 @@
+import { GFX } from "./gfx.js";
+import { Engine } from "./engine.js";
+import { Sprite } from "./sprite.js";
+import { AudioManager } from "./audio.js";
 /**
  * Game interface to be implemented by user
  * @member {GFX} gfx
@@ -5,10 +9,21 @@
  */
 export class Game {
   /**
-   * @param {GFX} gfx
-   * @param {Engine} engine
+   * Constructs a new Game instance with the provided GFX and Engine.
+   * @param {GFX} gfx - The GFX instance used for rendering.
+   * @param {Engine} engine - The Engine instance used for game logic.
+   * @property {GFX} gfx - The GFX instance used for rendering.
+   * @property {Engine} engine - The Engine instance used for game logic.
+   * @property {AudioManager} audio - The Audio instance from the Engine.
+   * @property {Object} camera - An object with methods to control the camera.
+   * @property {Function} camera.setPosition - Sets the camera position.
+   * @property {Function} camera.getPosition - Gets the current camera position.
+   * @property {Function} camera.move - Moves the camera by the specified x and y values.
+   * @property {Sprite[]} sprites - An array of Sprite instances to be rendered.
+   * @property {Function} shader - A function that sets the shader to be used by the Engine.
    */
   constructor(gfx, engine) {
+    
     this.gfx = gfx;
     this.engine = engine;
     this.audio = engine.audio;

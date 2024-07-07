@@ -1,6 +1,5 @@
 import flow from "../src/main.js";
 import path from "node:path";
-import { cwd } from "node:process";
 class Mario extends flow.Sprite {
   onCreate() {
     this.loadTexture("mario");

@@ -3,9 +3,33 @@ import classMethods from "class-methods";
 import { err } from "./utils.js";
 export class Sprite {
   /**
-   * @param {Game} game
+   * Constructs a new Sprite instance.
+   * @param {Game} game - The game instance that the sprite belongs to.
+   * @constructor
    */
   constructor(game) {
+    /**
+     * Constructs a new sprite object.
+     * @param {Object} game - The game object that contains the necessary components for the sprite.
+     * @param {Object} game.gfx - The graphics component.
+     * @param {Object} game.engine - The engine component.
+     * @param {Object} game.audio - The audio component.
+     * @param {Object} game.camera - The camera component.
+     * @property {Object} obj - The object representation of the sprite.
+     * @property {number} obj.x - The x-coordinate of the sprite.
+     * @property {number} obj.y - The y-coordinate of the sprite.
+     * @property {number} obj.z - The z-coordinate of the sprite.
+     * @property {Object} position - The position of the sprite.
+     * @property {number} position.x - The x-coordinate of the sprite's position.
+     * @property {number} position.y - The y-coordinate of the sprite's position.
+     * @property {Array.<number>} velocity - The velocity of the sprite.
+     * @property {number} width - The width of the sprite.
+     * @property {number} height - The height of the sprite.
+     * @property {Array.<string>} events - The events that the sprite can listen for.
+     * @property {Function} onClick - The function to be called when the sprite is clicked.
+     * @property {Function} onCreate - The function to be called when the sprite is created.
+     * @property {Function} onFrame - The function to be called on each frame.
+     */
     this.gfx = game.gfx;
     this.engine = game.engine;
     this.audio = game.audio;
@@ -45,7 +69,8 @@ export class Sprite {
     }
     this.onCreate();
   }
-  /**
+
+/**
    * Checks if the sprite is in a range
    * @param {Number} width
    * @param {Number} height
@@ -54,13 +79,16 @@ export class Sprite {
    * @returns {Boolean}
    */
   inBounds(width, height, minWidth, minHeight) {
-    try{
-    return !(
-      this.position.x > width - this.width ||
-      this.position.x < (minWidth || 0) ||
-      this.position.y > height - this.height ||
-      this.position.y < (minHeight || 0)
-    );}catch{err('Invalid Parameters')}
+    try {
+      return !(
+        this.position.x > width - this.width ||
+        this.position.x < (minWidth || 0) ||
+        this.position.y > height - this.height ||
+        this.position.y < (minHeight || 0)
+      );
+    } catch {
+      err("Invalid Parameters");
+    }
   }
   /**
    * Loads a texture

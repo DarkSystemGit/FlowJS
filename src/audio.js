@@ -18,14 +18,22 @@ class IPC {
     });
   }
 }
+/**
+ * Manages audio playback in the application.
+ */
 export class AudioManager {
+  /**
+   * Constructs a new AudioManager instance.
+   */
   constructor() {
     this.ipc = new IPC();
   }
+
   /**
-   * Internal method to load a audio file
-   * @param {String} path Path to file
-   * @param {String} name File Name
+   * Loads an audio file.
+   * @param {string} path - The path to the audio file.
+   * @param {string} name - The name of the audio file.
+   * @returns {Promise<void>} - A Promise that resolves when the audio file is loaded.
    */
   async _loadAudio(path, name) {
     try {
@@ -34,13 +42,14 @@ export class AudioManager {
       err("Error while loading audio, " + name);
     }
   }
+
   /**
-   * Plays a track
-   * @param {String} name Track Name
-   * @param {Number} volume Volume (1-100)
-   * @param {Boolean} loop Loop Track
-   * @param {Number} rate Playback Rate
-   * @returns {Number} Track ID
+   * Plays an audio track.
+   * @param {string} name - The name of the audio track to play.
+   * @param {number} volume - The volume of the audio track (1-100).
+   * @param {boolean} loop - Whether to loop the audio track.
+   * @param {number} rate - The playback rate of the audio track.
+   * @returns {Promise<number>} - A Promise that resolves with the ID of the playing track.
    */
   async play(name, volume, loop, rate) {
     try {
@@ -49,9 +58,11 @@ export class AudioManager {
       err(`Error while playing: ${name}`);
     }
   }
+
   /**
-   * Pauses a playing track
-   * @param {Number} id
+   * Pauses a playing audio track.
+   * @param {number} id - The ID of the track to pause.
+   * @returns {Promise<void>} - A Promise that resolves when the track is paused.
    */
   pause(id) {
     try {
@@ -60,9 +71,11 @@ export class AudioManager {
       err(`Error while pausing track`);
     }
   }
+
   /**
-   * Resumes a playing track
-   * @param {Number} id
+   * Resumes a paused audio track.
+   * @param {number} id - The ID of the track to resume.
+   * @returns {Promise<void>} - A Promise that resolves when the track is resumed.
    */
   resume(id) {
     try {
@@ -71,9 +84,11 @@ export class AudioManager {
       err(`Error while resumeing track`);
     }
   }
+
   /**
-   * Stops a playing track
-   * @param {Number} id
+   * Stops a playing audio track.
+   * @param {number} id - The ID of the track to stop.
+   * @returns {Promise<void>} - A Promise that resolves when the track is stopped.
    */
   stop(id) {
     try {
@@ -83,4 +98,5 @@ export class AudioManager {
     }
   }
 }
+
 const genUUID = () => crypto.randomBytes(16).toString("hex");
