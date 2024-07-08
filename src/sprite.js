@@ -105,7 +105,8 @@ export class Sprite {
           pixels: Canvas.createImageData(
             this.texture._getData(),
             ...this.texture.getShape()
-          ),
+          ),special: this.texture.special,
+          shape: this.texture.getShape(),
         });
       this.width = ntexture.getShape()[0];
       this.height = ntexture.getShape()[1];
@@ -119,6 +120,9 @@ export class Sprite {
   render() {
     this.obj.x += this.velocity[0];
     this.obj.y += this.velocity[1];
+    var shape= this.texture.getShape();
+    this.width=shape[0]
+    this.height=shape[1]
     this.position = { x: this.obj.x, y: this.obj.y };
     if (this.onFrame && this.id) this.onFrame();
     if (!this.id) {

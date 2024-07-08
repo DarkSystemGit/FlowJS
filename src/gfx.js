@@ -1,6 +1,6 @@
 import Canvas from "canvas";
 import { PixelArray } from "./texture.js";
-
+import { err } from "./utils.js";
 export class GFX {
   /**
    * Drawing interface
@@ -53,7 +53,7 @@ export class GFX {
   getObject(id) {
     try {
       var obj = this.engine._getObject(id);
-      return { x: obj.x, y: obj.y, z: obj.z, angle: obj.rotation };
+      return { x: obj.x, y: obj.y, z: obj.z, angle: obj.rotation,special: obj.special };
     } catch {
       err(`Error while getting object`);
     }

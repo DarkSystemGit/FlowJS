@@ -44,8 +44,12 @@ export class Engine {
      * @property {Object} utils - Utility functions
      */
     return (async () => {
-      game.window.dimensions=[game.window.width,game.window.height];
-      if(game.window.screen)game.window.screen=[game.window.screen.width/game.window.width,game.window.screen.height/game.window.height];
+      game.window.dimensions = [game.window.width, game.window.height];
+      if (game.window.screen)
+        game.window.screen = [
+          game.window.screen.width / game.window.width,
+          game.window.screen.height / game.window.height,
+        ];
       const window = (this.window = new Renderer(
         game.window.title,
         game.window.dimensions,
@@ -69,7 +73,7 @@ export class Engine {
         screenToWorld: (x, y) => this._convertCords(x, y, true),
         worldToScreen: (x, y) => this._convertCords(x, y),
       };
-      
+
       var handler = new game.game(new GFX(this), this);
       classMethods(game.game).forEach((method) => {
         if (!["onCreate", "onFrame"].includes(method)) {
@@ -233,59 +237,60 @@ export class Engine {
       item.z,
       item.shape,
       item.rotation,
-      item.id
+      item.id,
+      item.special
     );
   }
-    /** Internal method that actually draws to the screen */
-    async _drawObjects() {
-      var zaxis = Array.from(this.objects.keys()).sort((a, b) => a - b);
-      for (var z of zaxis) {
-        for (var item of this.objects.get(z)) {
-          if (!item) continue;
-          if (item.rotation) {
-            this.ctx.save();
-            this.ctx.translate(
-              item.x + item.shape[0] / 2,
-              item.y + item.shape[1] / 2
+  /** Internal method that actually draws to the screen */
+  async _drawObjects() {
+    var zaxis = Array.from(this.objects.keys()).sort((a, b) => a - b);
+    for (var z of zaxis) {
+      for (var item of this.objects.get(z)) {
+        if (!item) continue;
+        if (item.rotation) {
+          this.ctx.save();
+          this.ctx.translate(
+            item.x + item.shape[0] / 2,
+            item.y + item.shape[1] / 2
+          );
+          this.ctx.rotate((Math.PI * item.rotation) / 360);
+          var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
+          var tmpCtx = tmpCanvas.getContext("2d");
+          tmpCtx.putImageData(
+            item.pixels,
+            0,
+            0,
+            0,
+            0,
+            item.shape[0],
+            item.shape[1]
+          );
+          this.ctx.drawImage(tmpCanvas, -item.shape[0] / 2, -item.shape[1] / 2);
+          this.ctx.restore();
+        } else {
+          if (item.special && item.special[0] == "fs") {
+            this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
+            this.ctx.fill();
+          } else if (item.special && item.special[0] == "tex") {
+            this.ctx.drawImage(
+              createImageBitmap(item.pixels, ...item.shape),
+              item.x + -1 * this.camera[0],
+              item.y + -1 * this.camera[1],
+              item.special[1],
+              item.special[2]
             );
-            this.ctx.rotate((Math.PI * item.rotation) / 360);
-            var tmpCanvas = Canvas.createCanvas(item.shape[0], item.shape[1]);
-            var tmpCtx = tmpCanvas.getContext("2d");
-            tmpCtx.putImageData(
-              item.pixels,
-              0,
-              0,
-              0,
-              0,
-              item.shape[0],
-              item.shape[1]
-            );
-            this.ctx.drawImage(tmpCanvas, -item.shape[0] / 2, -item.shape[1] / 2);
-            this.ctx.restore();
           } else {
-            if (item.special && item.special[0] == "fs") {
-              this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
-              this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
-              this.ctx.fill();
-            } else if (item.special && item.special[0] == "tex") {
-              this.ctx.drawImage(
-                createImageBitmap(item.pixels, ...item.shape),
-                item.x + -1 * this.camera[0],
-                item.y + -1 * this.camera[1],
-                item.special[1],
-                item.special[2]
-              );
-            } else {
-              this.ctx.drawImage(
-                createImageBitmap(item.pixels, ...item.shape),
-                item.x + -1 * this.camera[0],
-                item.y + -1 * this.camera[1]
-              );
-            }
+            this.ctx.drawImage(
+              createImageBitmap(item.pixels, ...item.shape),
+              item.x + -1 * this.camera[0],
+              item.y + -1 * this.camera[1]
+            );
           }
         }
       }
     }
+  }
   /**
    *  Internal method to get an Object
    * @param {Number} id Object ID
@@ -406,414 +411,8 @@ export class Engine {
       }
     });
   }
-}/**
- * The Engine class is the main game engine that manages the game loop, rendering, and other core game systems.
- * It takes in a game class, screen dimensions, window title, and scale factor to initialize the game.
- */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * The `_drawObjects` method is an internal method of the `Engine` class that is responsible for drawing all the game objects to the canvas. It iterates through the objects in the `objects` map, sorted by their z-axis value, and draws each object to the canvas. The method handles both rotated and non-rotated objects, as well as special cases like full-screen overlays and textures.
- */export class AssetManager {
+}
+export class AssetManager {
   /** Internal class to manage asssets */
   constructor(aud) {
     this.assets = {};

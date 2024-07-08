@@ -1,5 +1,5 @@
-import { processArr, clone } from "./utils.js";
-
+import { processArr, createImageBitmap } from "./utils.js";
+import Canvas from 'canvas'
 export class PixelArray {
   constructor(w, h, data) {
     this.obj = { data: data || Array(w * h * 4), shape: [w, h, 4] };
@@ -58,7 +58,10 @@ export class Texture extends PixelArray {
    * @param {Number} height
    */
   setDimensions(width, height) {
-    this.special = ["tex", width, height, 4];
+    var tmpCtx=Canvas.createCanvas(width, height).getContext("2d");
+    tmpCtx.drawImage(createImageBitmap(Canvas.createImageData(this._getData(),...this.getShape()),...this.getShape()),0,0,width,height);
+    this.obj = { data: Array.from(tmpCtx.getImageData(0,0,width,height).data), shape: [width, height, 4] };
+    this.rotation=0
   }
   /**
    * Gets rotation angle
