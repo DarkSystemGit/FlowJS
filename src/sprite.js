@@ -70,7 +70,7 @@ export class Sprite {
     this.onCreate();
   }
 
-/**
+  /**
    * Checks if the sprite is in a range
    * @param {Number} width
    * @param {Number} height
@@ -91,6 +91,38 @@ export class Sprite {
     }
   }
   /**
+   * Checks if the sprite is in a Y range
+   * @param {Number} height
+   * @param {Number} minHeight
+   * @returns {Boolean}
+   */
+  inBoundsY(height, minHeight) {
+    try {
+      return !(
+        this.position.y > height - this.height ||
+        this.position.y < (minHeight || 0)
+      );
+    } catch {
+      err("Invalid Parameters");
+    }
+  }
+  /**
+   * Checks if the sprite is in a X range
+   * @param {Number} width
+   * @param {Number} minWidth
+   * @returns {Boolean}
+   */
+  inBoundsX(width, minWidth) {
+    try {
+      return !(
+        this.position.x > width - this.width ||
+        this.position.x < (minWidth || 0)
+      );
+    } catch {
+      err("Invalid Parameters");
+    }
+  }
+  /**
    * Loads a texture
    * @param {String|Texture} texture Asset or Texture to load
    */
@@ -105,7 +137,8 @@ export class Sprite {
           pixels: Canvas.createImageData(
             this.texture._getData(),
             ...this.texture.getShape()
-          ),special: this.texture.special,
+          ),
+          special: this.texture.special,
           shape: this.texture.getShape(),
         });
       this.width = ntexture.getShape()[0];
@@ -120,9 +153,9 @@ export class Sprite {
   render() {
     this.obj.x += this.velocity[0];
     this.obj.y += this.velocity[1];
-    var shape= this.texture.getShape();
-    this.width=shape[0]
-    this.height=shape[1]
+    var shape = this.texture.getShape();
+    this.width = shape[0];
+    this.height = shape[1];
     this.position = { x: this.obj.x, y: this.obj.y };
     if (this.onFrame && this.id) this.onFrame();
     if (!this.id) {
@@ -154,6 +187,14 @@ export class Sprite {
     } catch {
       err("Error when moving sprite");
     }
+  }
+  /**
+   * Sets the position of the sprite
+   * @param {Number} x 
+   * @param {Number} y 
+   */
+  setPosition(x,y){
+    this.changeSprite({x,y});
   }
   /**
    * Rotates a sprite
