@@ -63,6 +63,7 @@ export class Engine {
       this.uuid = 0;
       this.objects = new Map();
       this.mouse = [];
+      this.tilesets={}
       this.mouseClicks = [];
       this.shaders = [];
       this.camera = [0, 0];
@@ -411,6 +412,25 @@ export class Engine {
       }
     });
   }
+  /**
+   * Loads a tile
+   * @param {string} file - The file path of the tile asset to load.
+   * @param {string} name - The name to associate with the loaded tile asset.
+   * @returns {Object} - The loaded tile asset.
+   */
+  async loadTile(file, tileset,id) {
+    try {
+      file =  await getPixels(await readFile(file));
+      if(!this.tilesets[tileset]) {
+        this.tilesets[tileset] = [];
+      }
+      this.tilesets[tileset][id]=file;
+      
+    } catch {
+      err(`Error while loading tile in tileset ${tileset} : ${id}`);
+    }
+  }
+  
 }
 export class AssetManager {
   /** Internal class to manage asssets */
