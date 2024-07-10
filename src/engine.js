@@ -23,6 +23,7 @@ import { Renderer } from "./renderer.js";
  * @param {Object} game - The game class that will be used to handle game logic.
  * @returns {Promise<Engine>} A Promise that resolves to the initialized Engine instance.
  */
+
 export class Engine {
   constructor(game) {
     /**
@@ -273,13 +274,12 @@ export class Engine {
             this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
             this.ctx.fill();
-          } else if (item.special && item.special[0] == "tex") {
+          } else if (item.special && item.special[0] == "tile") {
+            var tile=this.tilesets[item.special[1]][item.special[2]]
             this.ctx.drawImage(
-              createImageBitmap(item.pixels, ...item.shape),
+              createImageBitmap(tile.data, ...tile.shape),
               item.x + -1 * this.camera[0],
               item.y + -1 * this.camera[1],
-              item.special[1],
-              item.special[2]
             );
           } else {
             this.ctx.drawImage(
@@ -430,7 +430,12 @@ export class Engine {
       err(`Error while loading tile in tileset ${tileset} : ${id}`);
     }
   }
-  
+   
+  renderTiles(tileset,tiles){
+    tiles.forEach((tile)=>{
+      this.draw(undefined,tile.x,tile.y,tile.z,undefined,0,undefined,['tile',tileset,tile.id]);
+    })
+  }
 }
 export class AssetManager {
   /** Internal class to manage asssets */
