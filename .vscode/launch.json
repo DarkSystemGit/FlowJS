@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [        
         {
+            "name": "Launch Program Tiled",
+            "program": "${workspaceFolder}/src/tiled.js",
+            "runtimeExecutable": "/Users/darksystem/.local/share/nvm/v20.15.0/bin/node",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
             "name": "Launch Program Audio",
             "runtimeExecutable": "/Users/darksystem/.local/share/nvm/v20.15.0/bin/node",
             "program": "${workspaceFolder}/src/audio.js",

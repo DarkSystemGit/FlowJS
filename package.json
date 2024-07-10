@@ -25,6 +25,7 @@
     "audio-play": "^2.3.1",
     "canvas": "^3.0.0-rc2",
     "class-methods": "^1.0.12",
+    "fast-xml-parser": "^4.4.0",
     "jpeg-js": "^0.4.4",
     "parse-tmx": "^1.15.0",
     "pngjs": "^7.0.0",

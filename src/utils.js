@@ -19,7 +19,7 @@ export const colliding = (obj1, obj2) =>
 export const processArr = (array) => {
   return array.flat(1);
 };
-export const getPixels = async (file) => {
+export const getPixels =  (file) => {
   var format = getFormat(file);
   if (format == "png") {
     var pix = PNG.sync.read(file);
@@ -69,6 +69,4 @@ export const brc=({ numBands=4, data, height, width })=> {
   return result;
 }
 
-if (typeof module !== "undefined") module.exports = brc;
-if (typeof window !== "undefined") window.brc = brc;
-if (typeof self !== "undefined") self.brc = brc;
+
