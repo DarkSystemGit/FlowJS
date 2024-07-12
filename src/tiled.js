@@ -13,6 +13,7 @@ function parse(mapPath){
             this.image=c.getContext('2d')
             this.cols=parseInt(t.tileset['@_columns'])
             this.spacing=parseInt(t.tileset['@_spacing'])||0
+            this.dims=[parseInt(t.tileset.image['@_width']),parseInt(t.tileset.image['@_height'])]
             this.tileDims=[parseFloat(t.tileset['@_tilewidth'])+(parseFloat(t.tileset['@_spacing'])||0),parseFloat(t.tileset['@_tileheight'])+(parseFloat(t.tileset['@_spacing'])||0)]
             var tileset=getPixels(fs.readFileSync(path.join(path.dirname(mapPath),t.tileset.image['@_source'])))
             this.image.putImageData(Canvas.createImageData(tileset.data,...tileset.shape),0,0)
@@ -24,8 +25,22 @@ function parse(mapPath){
             var pos=[(id%this.cols)*this.tileDims[0],Math.floor(id/this.cols)*this.tileDims[1]]
             return this.image.getImageData(...pos,this.tileDims[0]-this.spacing,this.tileDims[1]-this.spacing)
         }
+        getTiles(){return Math.floor(this.dims[0]/this.tileDims[0])*Math.floor(this.dims[1]/this.tileDims[1])-1}
     })(t))
-    return {tilesets}
+    const getTile=id=>{
+        var previd=0
+        return tilesets.find(t=>{
+            if(t.getTiles()+previd>id&&id>previd)return t
+            previd=t.getTiles()+previd
+        }).getTile(id-previd-1)
+
+    }
+    var layers=map.layers.map(l=>new (class Layer{
+        constructor(layer){
+
+        }
+    })(l))
+    return {tilesets,layers,getTile}
 }
 var map=await parse('./test/map.json')
-fs.writeFileSync('./tile.rgba',JSON.stringify(Array.from(map.tilesets[0].getTile(123).data)).replace('[','').replace(']',''))
+fs.writeFileSync('./tile.rgba',JSON.stringify(Array.from(map.getTile(1964).data)).replace('[','').replace(']',''))

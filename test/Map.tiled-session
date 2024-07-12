@@ -7,6 +7,12 @@
     "expandedProjectPaths": [
     ],
     "fileStates": {
+        "Game.tsx": {
+            "scaleInEditor": 8
+        },
+        "test.tsx": {
+            "scaleInEditor": 8
+        }
     },
     "last.exportedFilePath": "/Users/darksystem/Projects/FlowJS/test",
     "last.imagePath": "/Users/darksystem/Projects/FlowJS/test",
@@ -21,10 +27,12 @@
     ],
     "project": "Map.tiled-project",
     "recentFiles": [
+        "test.tsx",
+        "Game.tsx"
     ],
     "resizeMap.removeObjects": false,
     "tileset.lastUsedFormat": "tsx",
-    "tileset.margin": 1,
+    "tileset.margin": 0,
     "tileset.tileSize": {
         "height": 16,
         "width": 16
