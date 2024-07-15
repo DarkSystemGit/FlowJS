@@ -167,10 +167,5 @@ function parse(mapPath) {
   return { tilesets, layers, getTile };
 }
 var map = await parse("./test/map.json");
-fs.writeFileSync(
-  "./tile.png",
-  map.layers[0]
-    .draw(Canvas.createCanvas(1280, 720).getContext("2d"))
-    .canvas.toBuffer("image/png")
-);
+
 //fs.writeFileSync('./tile.rgba',JSON.stringify(Array.from(map.getTile(1964).data)).replace('[','').replace(']',''))
