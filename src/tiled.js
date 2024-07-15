@@ -5,6 +5,7 @@ import Canvas from "canvas";
 import { getPixels, err, createImageBitmap } from "./utils.js";
 function parse(mapPath) {
   var map = JSON.parse(fs.readFileSync(mapPath));
+  if(map.infinite) return err("Infinite maps are not supported");
   var tilesets = map.tilesets
     .map((tileset) => {
       return new XMLParser({
@@ -104,6 +105,8 @@ function parse(mapPath) {
             case "right-down":
               for (var i = 0; i < this.layer.length; i++)
                 this.drawTile(i, this.layer, tCtx);
+            case "left-up":
+                for (var i = this.layer.length - 1; i >= 0; i--)this.drawTile(i, this.layer, tCtx);
           }
           ctx.drawImage(tCtx.canvas, 0, 0);
           return ctx;
