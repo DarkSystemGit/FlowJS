@@ -2,7 +2,7 @@ import { XMLParser } from 'fast-xml-parser';
 import path from 'path'
 import fs from "fs";
 import Canvas from 'canvas'
-import { getPixels } from './utils.js';
+import { getPixels,err } from './utils.js';
 function parse(mapPath){
     var map=JSON.parse(fs.readFileSync(mapPath))
     var tilesets=map.tilesets.map(tileset=>{
@@ -41,9 +41,21 @@ function parse(mapPath){
         constructor(layer){
             this.layer=layer.data.map(id=>getTile(id))
         }
+        draw(ctx){
+            var tCtx=Canvas.createCanvas(map.width*map.tilewidth,map.height*map.tileheight).getContext('2d')
+            switch(map.renderorder){
+                default:err('Invalid renderorder')
+                case 'right-down':for(var i=0;i<this.layer.length;i++)this.drawTile(i,this.layer,tCtx)
+            }
+            ctx.drawImage(tCtx.canvas,0,0)
+            return ctx
+        }
+        drawTile(i,arr,ctx){
+            ctx.putImageData(arr[i],...[i%map.width,Math.floor(i/map.width)].map(e=>e*map.tilewidth))
+        }
     })(l))
     return {tilesets,layers,getTile}
 }
 var map=await parse('./test/map.json')
-console.log(map.layers[0].layer)
+fs.writeFileSync('./tile.png',map.layers[0].draw(Canvas.createCanvas(1280,720).getContext('2d')).canvas.toBuffer('image/png'))
 //fs.writeFileSync('./tile.rgba',JSON.stringify(Array.from(map.getTile(1964).data)).replace('[','').replace(']',''))
