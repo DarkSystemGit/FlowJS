@@ -94,7 +94,7 @@ function parse(mapPath) {
         constructor(layer) {
           this.layer = layer.data.map((id) => [getTile(id), id]);
         }
-        draw(ctx) {
+        draw() {
           var tCtx = Canvas.createCanvas(
             map.width * map.tilewidth,
             map.height * map.tileheight
@@ -108,8 +108,7 @@ function parse(mapPath) {
             case "left-up":
                 for (var i = this.layer.length - 1; i >= 0; i--)this.drawTile(i, this.layer, tCtx);
           }
-          ctx.drawImage(tCtx.canvas, 0, 0);
-          return ctx;
+          return tCtx;
         }
         drawTile(i, arr, ctx) {
           var t = false;
@@ -164,8 +163,24 @@ function parse(mapPath) {
         }
       })(l)
   );
-  return { tilesets, layers, getTile };
+  return { tilesets, layers, getTile,width:map.width*map.tilewidth,height:map.height*map.tileheight };
 }
-var map = await parse("./test/map.json");
-
+class Map{
+  constructor(file){
+    this.map=parse(file)
+    this.width=this.map.width
+    this.height=this.map.height
+  }
+  getLayer(z,x,y,w,h){
+    return this.map.layers[z].draw().getImageData(x||0,y||0,w||this.map.width,h||this.map.height)
+  }
+  setTile(z,x,y,id){
+    this.map.layers[z].layer[x+y*this.map.width]=[this.map.getTile(id),id]
+  }
+  getTile(z,x,y){
+    return this.map.layers[z].layer[x+y*this.map.width][1]
+  }
+}
+var map = new Map("./test/map.json");
+fs.writeFileSync('./tile.png',createImageBitmap(map.getLayer(0),map.width,map.height).toBuffer('image/png'))
 //fs.writeFileSync('./tile.rgba',JSON.stringify(Array.from(map.getTile(1964).data)).replace('[','').replace(']',''))
