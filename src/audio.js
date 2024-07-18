@@ -1,23 +1,4 @@
-import { Worker } from "node:worker_threads";
-import crypto from "crypto";
-import path from "path";
-import { err } from "./utils.js";
-class IPC {
-  constructor() {
-    this.messages = {};
-    this.worker = new Worker(
-      path.join(import.meta.dirname, "./audioWorker.js")
-    );
-    this.worker.on("message", (m) => this.messages[m.id](m));
-  }
-  send(type, params) {
-    return new Promise((resolve) => {
-      var id = genUUID();
-      this.messages[id] = (m) => resolve(m.res);
-      this.worker.postMessage({ type, id, ...params });
-    });
-  }
-}
+import { err, IPC } from "./utils.js";
 /**
  * Manages audio playback in the application.
  */
@@ -26,7 +7,7 @@ export class AudioManager {
    * Constructs a new AudioManager instance.
    */
   constructor() {
-    this.ipc = new IPC();
+    this.ipc = new IPC("audioWorker.js");
   }
 
   /**
@@ -98,5 +79,3 @@ export class AudioManager {
     }
   }
 }
-
-const genUUID = () => crypto.randomBytes(16).toString("hex");
