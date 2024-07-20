@@ -1,6 +1,7 @@
 import Canvas from "canvas";
 import { PixelArray } from "./texture.js";
 import { err } from "./utils.js";
+import { Map } from "./tiled.js";
 export class GFX {
   /**
    * Drawing interface
@@ -11,14 +12,15 @@ export class GFX {
     this.engine = engine;
   }
   /**
-   * Draw a PixelArray or Texture to the screen
+   * Draw a object to the screen
    * @param {Number} x X cord
    * @param {Number} y Y cord
    * @param {Number} z Z cord
-   * @param {PixelArray|Texture} pixels PixelArray or Texture to draw
+   * @param {PixelArray|Texture|Map} pixels PixelArray, Texture or Map to draw
    * @returns {Number}
    */
   draw(x, y, z, pixels) {
+    if(pixels instanceof Map)return this.engine.drawMap(pixels,x,y,z)
     return this.engine.draw(
       Canvas.createImageData(pixels._getData(), ...pixels.getShape()),
       x,
@@ -53,7 +55,13 @@ export class GFX {
   getObject(id) {
     try {
       var obj = this.engine._getObject(id);
-      return { x: obj.x, y: obj.y, z: obj.z, angle: obj.rotation,special: obj.special };
+      return {
+        x: obj.x,
+        y: obj.y,
+        z: obj.z,
+        angle: obj.rotation,
+        special: obj.special,
+      };
     } catch {
       err(`Error while getting object`);
     }
@@ -116,6 +124,13 @@ export class GFX {
     }
   }
   /**
+   * Gets a map
+   * @param {String} name Map name
+   */
+  getMap(name) {
+    return this.engine.getMap(name);
+  }
+  /**
    * Sets layer background
    * @param {Texture|String} texture
    */
@@ -134,8 +149,10 @@ export class GFX {
         z: layer,
         shape: texture.getShape(),
         rotation: 0,
+        id:this.engine.uuid,
         special: texture.special,
       });
+      this.engine.uuid++;
     } catch {
       err(`Error while setting layer background`);
     }

@@ -15,7 +15,7 @@ import { AudioManager } from "./audio.js";
 import { readFile } from "node:fs/promises";
 import { Texture } from "./texture.js";
 import { Renderer } from "./renderer.js";
-
+import { Map as TMap } from "./tiled.js";
 /**
  * The Engine class is the main game engine that manages the game loop, rendering, and other core game systems.
  * It takes in a game class, screen dimensions, window title, and scale factor to initialize the game.
@@ -64,13 +64,14 @@ export class Engine {
       this.uuid = 0;
       this.objects = new Map();
       this.mouse = [];
-      this.tilesets={}
+      this.tilesets = {};
       this.mouseClicks = [];
       this.shaders = [];
       this.camera = [0, 0];
       this.keyboard = [[0, 0]];
       this.audio = new AudioManager();
       this.assets = new AssetManager(this.audio);
+      this.maps = [];
       this.utils = {
         screenToWorld: (x, y) => this._convertCords(x, y, true),
         worldToScreen: (x, y) => this._convertCords(x, y),
@@ -88,7 +89,11 @@ export class Engine {
           }
         }
       });
-      this.onFrame = (a) => handler._onFrame(a) || function () {};
+      this.onFrame =
+        ((a) => {
+          this._onFrame();
+          handler._onFrame(a);
+        }) || function () {};
       //very slow,loading screen needed
       await handler.onCreate(this);
       var gameLoop = async () => {
@@ -114,8 +119,10 @@ export class Engine {
       return await this.assets.loadAudio(path, name);
     if ([".png", ".jpeg"].includes(npath.extname(path)))
       return await this.assets.loadTexture(path, name);
-    if (npath.extname(path) == ".glsl")
+    if ([".glsl", ".frag"].includes(npath.extname(path)))
       return await this.assets.loadFile(path, name);
+    if ([".json"].includes(npath.extname(path)))
+      return this.assets.loadMap(path, name);
     err("Invalid asset type, " + npath.extname(path).replace(".", ""));
   }
   /** Lists loaded assets
@@ -205,7 +212,8 @@ export class Engine {
    */
   draw(pixels, x, y, z, shape, angle, oldid, special) {
     try {
-      var id = oldid || JSON.parse(JSON.stringify(this.uuid));
+      var id = JSON.parse(JSON.stringify(this.uuid));
+      if(!(oldid==undefined))id=oldid
       this.objects.set(z, this.objects.get(z) || []);
       this.objects
         .get(z)
@@ -215,6 +223,43 @@ export class Engine {
     } catch {
       err(`Error while drawing object`);
     }
+  }
+  /**
+   * Gets a loaded map
+   * @param {String} name
+   */
+  getMap(name) {
+    return this.assets.assets[name].type == "map"
+      ? this.assets.assets[name].data
+      : null;
+  }
+  /**
+   * Draws a map to the screen
+   * @param {String} map Map
+   * @param {Number} x X cord
+   * @param {Number} y Y cord
+   * @param {Number} z Z cord
+   */
+  drawMap(map, x, y, z) {
+    var ids=[]
+    var map=map
+    for(var i=0;i<map.getLayers();i++){
+      ids.push(i+z)
+    }
+    this.maps.push({map,x,y,ids,obj:[]});
+  }
+  _onFrame() {
+    this.maps.forEach((map)=>{
+      if(map.obj.length==0){
+        for(var i=0;i<map.map.getLayers();i++){
+          map.obj.push(this.draw(map.map.getLayer(i),map.x,map.y,map.ids[i],[map.map.width,map.map.height]))
+        }
+      }else{
+        for(var i=0;i<map.map.getLayers();i++){
+          this.changeObject(map.obj[i],{pixels:map.map.getLayer(i)})
+        }
+      }
+    })
   }
   /**
    *  Changes an object
@@ -274,13 +319,6 @@ export class Engine {
             this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
             this.ctx.fill();
-          } else if (item.special && item.special[0] == "tile") {
-            var tile=this.tilesets[item.special[1]][item.special[2]]
-            this.ctx.drawImage(
-              createImageBitmap(tile.data, ...tile.shape),
-              item.x + -1 * this.camera[0],
-              item.y + -1 * this.camera[1],
-            );
           } else {
             this.ctx.drawImage(
               createImageBitmap(item.pixels, ...item.shape),
@@ -412,30 +450,6 @@ export class Engine {
       }
     });
   }
-  /**
-   * Loads a tile
-   * @param {string} file - The file path of the tile asset to load.
-   * @param {string} name - The name to associate with the loaded tile asset.
-   * @returns {Object} - The loaded tile asset.
-   */
-  async loadTile(file, tileset,id) {
-    try {
-      file =  await getPixels(await readFile(file));
-      if(!this.tilesets[tileset]) {
-        this.tilesets[tileset] = [];
-      }
-      this.tilesets[tileset][id]=file;
-      
-    } catch {
-      err(`Error while loading tile in tileset ${tileset} : ${id}`);
-    }
-  }
-   
-  renderTiles(tileset,tiles){
-    tiles.forEach((tile)=>{
-      this.draw(undefined,tile.x,tile.y,tile.z,undefined,0,undefined,['tile',tileset,tile.id]);
-    })
-  }
 }
 export class AssetManager {
   /** Internal class to manage asssets */
@@ -486,6 +500,20 @@ export class AssetManager {
       return this.assets[name];
     } catch {
       err(`Error while loading asset: ${name}`);
+    }
+  }
+  /**
+   * Loads a map
+   * @param {String} file File Path
+   * @param {String} name Asset Name
+   * @returns {Map} Map
+   */
+  loadMap(file, name) {
+    try {
+      this.assets[name] = { data: new TMap(file), type: "map" };
+      return this.assets[name];
+    } catch (e) {
+      err(`Error while loading asset: ${name}, ${e}`);
     }
   }
   /**

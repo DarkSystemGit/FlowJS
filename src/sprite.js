@@ -15,6 +15,7 @@ export class Sprite {
      * @param {Object} game.engine - The engine component.
      * @param {Object} game.audio - The audio component.
      * @param {Object} game.camera - The camera component.
+     * @property {Object} game - The game object that contains the necessary components for the sprite.
      * @property {Object} obj - The object representation of the sprite.
      * @property {number} obj.x - The x-coordinate of the sprite.
      * @property {number} obj.y - The y-coordinate of the sprite.
@@ -39,6 +40,7 @@ export class Sprite {
     this.velocity = [0, 0];
     this.width = 0;
     this.height = 0;
+    this.game=game
     var events = ["onMouseLeft", "onMouseMove", "onMouseRight", "onKeyPress"];
     classMethods(this).forEach((m) =>
       game._rEv(m, (...args) => this[m](...args))

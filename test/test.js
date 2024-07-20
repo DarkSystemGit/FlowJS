@@ -3,9 +3,9 @@ import path from "node:path";
 class Mario extends flow.Sprite {
   onCreate() {
     var mario = this.gfx.getTexture("mario");
-    mario.setDimensions(48, 78);
+    mario.setDimensions(32, 52);
     this.loadTexture(mario);
-    this.setPosition(0, 640-this.height);
+    this.setPosition(0, 464-this.height);
   }
   onFrame() {
     if (
@@ -42,15 +42,16 @@ class MyGame extends flow.Game {
   async onCreate() {
     var dir = (f) => path.join(path.dirname(import.meta.dirname), "test", f);
     await this.engine.loadAsset(dir("test.png"), "mario");
-    await this.engine.loadAsset(dir("background.jpeg"), "marioBg");
+    await this.engine.loadAsset(dir("level.png"), "marioBg");
     await this.engine.loadAsset(dir("mario.wav"), "marioTrack");
     await this.engine.loadAsset(dir("shader.glsl"), "shader");
+    await this.engine.loadAsset(dir("map.json"), "marioMap");
+    this.gfx.draw(0,0,0,this.gfx.getMap("marioMap"));
     //this.engine.setShader('shader')
-    this.gfx.fillScreen([0, 0, 255, 255]);
+    //this.gfx.fillScreen([0, 0, 255, 255]);
     this.addSprite(Mario);
-    var bg = this.gfx.getTexture("marioBg");
-    bg.setDimensions(1280, 720);
-    this.gfx.setLayerBackground(0, bg);
+    //var bg = this.gfx.getTexture("marioBg");
+    //this.gfx.setLayerBackground(0, bg);
     this.audio.play('marioTrack',200,true)
   }
 }
