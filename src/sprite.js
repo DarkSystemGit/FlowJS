@@ -1,6 +1,10 @@
 import Canvas from "canvas";
 import classMethods from "class-methods";
 import { err } from "./utils.js";
+import { GFX } from "./gfx.js";
+import { Engine } from "./engine.js";
+import { AudioManager } from "./audio.js";
+import { Game } from "./game.js";
 export class Sprite {
   /**
    * Constructs a new Sprite instance.
@@ -10,12 +14,15 @@ export class Sprite {
   constructor(game) {
     /**
      * Constructs a new sprite object.
-     * @param {Object} game - The game object that contains the necessary components for the sprite.
-     * @param {Object} game.gfx - The graphics component.
-     * @param {Object} game.engine - The engine component.
-     * @param {Object} game.audio - The audio component.
+     * @param {Game} game - The game object that contains the necessary components for the sprite.
+     * @param {GFX} game.gfx - The graphics component.
+     * @param {Engine} game.engine - The engine component.
+     * @param {AudioManager} game.audio - The audio component.
      * @param {Object} game.camera - The camera component.
      * @property {Object} game - The game object that contains the necessary components for the sprite.
+     * @property {GFX} gfx - The graphics component.
+     * @property {Engine} engine - The engine component.
+     * @property {AudioManager} audio - The audio component.
      * @property {Object} obj - The object representation of the sprite.
      * @property {number} obj.x - The x-coordinate of the sprite.
      * @property {number} obj.y - The y-coordinate of the sprite.
@@ -23,10 +30,10 @@ export class Sprite {
      * @property {Object} position - The position of the sprite.
      * @property {number} position.x - The x-coordinate of the sprite's position.
      * @property {number} position.y - The y-coordinate of the sprite's position.
-     * @property {Array.<number>} velocity - The velocity of the sprite.
+     * @property {Array<number>} velocity - The velocity of the sprite.
      * @property {number} width - The width of the sprite.
      * @property {number} height - The height of the sprite.
-     * @property {Array.<string>} events - The events that the sprite can listen for.
+     * @property {Array<string>} events - The events that the sprite can listen for.
      * @property {Function} onClick - The function to be called when the sprite is clicked.
      * @property {Function} onCreate - The function to be called when the sprite is created.
      * @property {Function} onFrame - The function to be called on each frame.
@@ -71,7 +78,31 @@ export class Sprite {
     }
     this.onCreate();
   }
-
+  /**
+   * Called on key press, implement this to add key press functionality
+   * @param {String[]} key Currently pressed keys
+   */
+  onKeyPress(){}
+  /**
+   * Called on mouse left press, implemented by subclass
+   */
+  onMouseLeft(){}
+  /**
+   * Called on mouse right press, implemented by subclass
+   */
+  onMouseRight(){}
+  /**
+   * Called on mouse move, implemented by subclass
+   */
+  onMouseMove(){}
+  /**
+    * Called on mouse middle down, implemented by subclass
+    */
+  onMouseMiddle(){}
+  /**
+   * Called on click, implemented by subclass
+   */
+  onClick(){}
   /**
    * Checks if the sprite is in a range
    * @param {Number} width

@@ -16,7 +16,6 @@ export class Game {
      * @property {Function} camera.getPosition - Gets the current camera position.
      * @property {Function} camera.move - Moves the camera by the specified x and y values.
      * @property {Sprite[]} sprites - An array of Sprite instances to be rendered.
-     * @property {Function} shader - A function that sets the shader to be used by the Engine.
      */
     constructor(gfx: GFX, engine: Engine);
     gfx: GFX;
@@ -29,7 +28,36 @@ export class Game {
     };
     sprites: any[];
     /**
-     * Called on each frame
+     * Called on creation, implimented by subclass
+     */
+    onCreate(): Promise<void>;
+    /**
+     * Called on each frame, implimented by subclass
+     */
+    onFrame(): void;
+    /**
+     * Called on key press, implemented by subclass
+     * @param {String[]} key Currently pressed keys
+     */
+    onKeyPress(): void;
+    /**
+     * Called on mouse left press, implemented by subclass
+     */
+    onMouseLeft(): void;
+    /**
+     * Called on mouse right press, implemented by subclass
+     */
+    onMouseRight(): void;
+    /**
+     * Called on mouse middle down, implemented by subclass
+     */
+    onMouseMiddle(): void;
+    /**
+     * Called on mouse move, implemented by subclass
+     */
+    onMouseMove(): void;
+    /**
+     * Internal, called on each frame
      */
     _onFrame(): void;
     /** Adds a Sprite to be drawn

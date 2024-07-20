@@ -27,6 +27,11 @@ import { Map as TMap } from "./tiled.js";
 export class Engine {
   constructor(game) {
     /**
+     * @param {Object} game - The game settings.
+     * @param {Object} game.game - The game class that will be used to handle game logic.
+     * @param {number} game.window.width - The width of the game window.
+     * @param {number} game.window.height - The height of the game window.
+     * @param {string} game.window.title - The title of the game window.
      * @property {Renderer} window - The game window
      * @property {Object} events - Event handlers
      * @property {Canvas} canvas - The game canvas

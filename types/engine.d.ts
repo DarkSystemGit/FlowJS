@@ -1,13 +1,12 @@
 /**
- * @class Engine
- * @description Game Engine
- * @param {Class} handlerClass Game class
- * @param {Array<number>} dimensions Screen dimensions
- * @param {String} title Window Title
- * @param {Number[]} scale Scale factor
+ * The Engine class is the main game engine that manages the game loop, rendering, and other core game systems.
+ * It takes in a game class, screen dimensions, window title, and scale factor to initialize the game.
+ *
+ * @param {Object} game - The game class that will be used to handle game logic.
+ * @returns {Promise<Engine>} A Promise that resolves to the initialized Engine instance.
  */
 export class Engine {
-    constructor(handlerClass: any, dimensions: any, title: any, scale: any);
+    constructor(game: any);
     window: Renderer;
     events: {
         keyboard: {};
@@ -20,17 +19,19 @@ export class Engine {
     uuid: number;
     objects: Map<any, any>;
     mouse: any[];
+    tilesets: {};
     mouseClicks: any[];
     shaders: any[];
     camera: number[];
     keyboard: number[][];
     audio: AudioManager;
     assets: AssetManager;
+    maps: any[];
     utils: {
         screenToWorld: (x: any, y: any) => number[];
         worldToScreen: (x: any, y: any) => number[];
     };
-    onFrame: (a: any) => any;
+    onFrame: (a: any) => void;
     /**
      * Loads an asset
      * @param {String} path Path to file
@@ -100,40 +101,27 @@ export class Engine {
      */
     draw(pixels: ImageData, x: number, y: number, z: number, shape: Array<number>, angle: number, oldid: number, special: any): number;
     /**
+     * Gets a loaded map
+     * @param {String} name
+     */
+    getMap(name: string): any;
+    /**
+     * Draws a map to the screen
+     * @param {String} map Map
+     * @param {Number} x X cord
+     * @param {Number} y Y cord
+     * @param {Number} z Z cord
+     */
+    drawMap(map: string, x: number, y: number, z: number): void;
+    _onFrame(): void;
+    /**
      *  Changes an object
      * @param {Number} id Object ID
      * @param {Object} newObj Updated Properties
      */
     changeObject(id: number, newObj: any): void;
-    /**
-     * Internal method that actually draws objects to the screen
-     */
+    /** Internal method that actually draws to the screen */
     _drawObjects(): Promise<void>;
-    /**
-     * Draws a rotated object to the canvas
-     * @param {Object} item - The object to be drawn
-     */
-    _drawRotatedObject(item: any): void;
-    /**
-     * Draws a non-rotated object to the canvas
-     * @param {Object} item - The object to be drawn
-     */
-    _drawNonRotatedObject(item: any): void;
-    /**
-     * Draws a full-screen rectangle with a specified color
-     * @param {Array} color - An array of RGBA values for the rectangle color
-     */
-    _drawFullscreenRect(color: any[]): void;
-    /**
-     * Draws a texture to the canvas
-     * @param {Object} item - The object containing the texture data
-     */
-    _drawTexture(item: any): void;
-    /**
-     * Draws an image to the canvas
-     * @param {Object} item - The object containing the image data
-     */
-    _drawImage(item: any): void;
     /**
      *  Internal method to get an Object
      * @param {Number} id Object ID
@@ -182,6 +170,13 @@ export class AssetManager {
      * @returns {Object} Asset
      */
     loadFile(file: string, name: string): any;
+    /**
+     * Loads a map
+     * @param {String} file File Path
+     * @param {String} name Asset Name
+     * @returns {Map} Map
+     */
+    loadMap(file: string, name: string): Map<any, any>;
     /**
      * Gets a file from storage
      * @param {String} name file name

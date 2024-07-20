@@ -20,10 +20,8 @@ export class Game {
    * @property {Function} camera.getPosition - Gets the current camera position.
    * @property {Function} camera.move - Moves the camera by the specified x and y values.
    * @property {Sprite[]} sprites - An array of Sprite instances to be rendered.
-   * @property {Function} shader - A function that sets the shader to be used by the Engine.
    */
   constructor(gfx, engine) {
-    
     this.gfx = gfx;
     this.engine = engine;
     this.audio = engine.audio;
@@ -33,10 +31,38 @@ export class Game {
       move: (x, y) => this.engine.moveCamera(x, y),
     };
     this.sprites = [];
-    if (this.shader) this.engine.setShaderFunc(this.shader);
   }
   /**
-   * Called on each frame
+   * Called on creation, implimented by subclass
+   */
+  async onCreate() {}
+  /**
+   * Called on each frame, implimented by subclass
+   */
+  onFrame() {}
+  /**
+   * Called on key press, implemented by subclass
+   * @param {String[]} key Currently pressed keys
+   */
+  onKeyPress() {}
+  /**
+   * Called on mouse left press, implemented by subclass
+   */
+  onMouseLeft() {}
+  /**
+   * Called on mouse right press, implemented by subclass
+   */
+  onMouseRight() {}
+  /**
+   * Called on mouse middle down, implemented by subclass
+   */
+  onMouseMiddle() {}
+  /**
+   * Called on mouse move, implemented by subclass
+   */
+  onMouseMove() {}
+  /**
+   * Internal, called on each frame
    */
   _onFrame() {
     this.sprites.forEach((s) => (s ? s.render() : undefined));

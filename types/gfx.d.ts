@@ -7,14 +7,14 @@ export class GFX {
     ctx: any;
     engine: Engine;
     /**
-     * Draw a PixelArray or Texture to the screen
+     * Draw a object to the screen
      * @param {Number} x X cord
      * @param {Number} y Y cord
      * @param {Number} z Z cord
-     * @param {PixelArray|Texture} pixels PixelArray or Texture to draw
+     * @param {PixelArray|Texture|Map} pixels PixelArray, Texture or Map to draw
      * @returns {Number}
      */
-    draw(x: number, y: number, z: number, pixels: PixelArray | Texture): number;
+    draw(x: number, y: number, z: number, pixels: PixelArray | Texture | Map): number;
     /**
      * Moves a Object around the screen
      * @param {Number} id Object ID
@@ -57,6 +57,11 @@ export class GFX {
      */
     getTexture(texture: string): Texture;
     /**
+     * Gets a map
+     * @param {String} name Map name
+     */
+    getMap(name: string): any;
+    /**
      * Sets layer background
      * @param {Texture|String} texture
      */
@@ -68,3 +73,4 @@ export class GFX {
     updateEngine(engine: Engine): void;
 }
 import { PixelArray } from "./texture.js";
+import { Map } from "./tiled.js";

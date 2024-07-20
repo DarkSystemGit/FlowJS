@@ -2,12 +2,11 @@
   "name": "flowjs",
   "version": "1.0.0",
   "description": "A Node.JS Game Engine",
-  "main": "gfx.js",
+  "main": "./src/main.js",
   "type": "module",
   "types": "./types/main.d.ts",
   "scripts": {
     "test": "node ./test/test.js",
-    "start": "node ./test/test.js",
     "types": "npx tsc --noEmit false --emitDeclarationOnly true --declaration --declarationDir ./types"
   },
   "keywords": [

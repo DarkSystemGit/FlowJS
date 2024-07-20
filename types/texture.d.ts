@@ -42,5 +42,4 @@ export class Texture extends PixelArray {
      * @param {Number} height
      */
     setDimensions(width: number, height: number): void;
-    special: (string | number)[];
 }

@@ -1,4 +1,3 @@
-/// <reference types="node" />
 /**
  * Manages audio playback in the application.
  */
@@ -39,10 +38,4 @@ export class AudioManager {
      */
     stop(id: number): Promise<void>;
 }
-declare class IPC {
-    messages: {};
-    worker: Worker;
-    send(type: any, params: any): Promise<any>;
-}
-import { Worker } from "node:worker_threads";
-export {};
+import { IPC } from "./utils.js";
