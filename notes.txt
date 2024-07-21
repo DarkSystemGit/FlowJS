@@ -4,9 +4,3 @@ Total allowable frame time:30.17ms
 Min FPS:~30
 Max FPS:61.84
 FPS variation:~27.11
-Shaders:
-Allocated:5ms
-Given a seprate thread
-Max pixel troughput:625000 per frame
-Max square resolution:790x790
-Game cannot run with a HD resolution,without cutting into user time

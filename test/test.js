@@ -39,7 +39,7 @@ class Mario extends flow.Sprite {
   }
 }
 class MyGame extends flow.Game {
-  async onCreate() {
+  /*async onCreate() {
     var dir = (f) => path.join(path.dirname(import.meta.dirname), "test", f);
     await this.engine.loadAsset(dir("test.png"), "mario");
     await this.engine.loadAsset(dir("level.png"), "marioBg");
@@ -53,7 +53,7 @@ class MyGame extends flow.Game {
     //var bg = this.gfx.getTexture("marioBg");
     //this.gfx.setLayerBackground(0, bg);
     this.audio.play('marioTrack',200,true)
-  }
+  }*/
 }
 new flow.Engine({
   game: MyGame,
