@@ -59,8 +59,9 @@ export class GFX {
     /**
      * Gets a map
      * @param {String} name Map name
+     * @returns {Map} Map
      */
-    getMap(name: string): any;
+    getMap(name: string): Map;
     /**
      * Sets layer background
      * @param {Texture|String} texture

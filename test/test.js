@@ -8,6 +8,7 @@ class Mario extends flow.Sprite {
     this.setPosition(0, 464-this.height);
   }
   onFrame() {
+    console.log(this.gfx.getMap("marioMap").getTile(1,this.position.x,this.position.y))
     if (
       (!this.inBounds(1280, 640) && !(this.position.y < 0)) ||
       this.getCollisions().length != 0
@@ -39,7 +40,7 @@ class Mario extends flow.Sprite {
   }
 }
 class MyGame extends flow.Game {
-  /*async onCreate() {
+  async onCreate() {
     var dir = (f) => path.join(path.dirname(import.meta.dirname), "test", f);
     await this.engine.loadAsset(dir("test.png"), "mario");
     await this.engine.loadAsset(dir("level.png"), "marioBg");
@@ -47,13 +48,13 @@ class MyGame extends flow.Game {
     await this.engine.loadAsset(dir("shader.glsl"), "shader");
     await this.engine.loadAsset(dir("map.json"), "marioMap");
     this.gfx.draw(0,0,0,this.gfx.getMap("marioMap"));
-    //this.engine.setShader('shader')
+    this.engine.setShader('shader')
     //this.gfx.fillScreen([0, 0, 255, 255]);
     this.addSprite(Mario);
     //var bg = this.gfx.getTexture("marioBg");
     //this.gfx.setLayerBackground(0, bg);
     this.audio.play('marioTrack',200,true)
-  }*/
+  }
 }
 new flow.Engine({
   game: MyGame,

@@ -126,6 +126,7 @@ export class GFX {
   /**
    * Gets a map
    * @param {String} name Map name
+   * @returns {Map} Map
    */
   getMap(name) {
     return this.engine.getMap(name);

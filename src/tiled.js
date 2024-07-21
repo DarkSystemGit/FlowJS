@@ -173,6 +173,7 @@ function parse(mapPath) {
     getTile,
     width: map.width * map.tilewidth,
     height: map.height * map.tileheight,
+    tilewidth:map.tilewidth
   };
 }
 export class Map {
@@ -234,7 +235,7 @@ export class Map {
    * @returns {number} - The tile id.
    */
   getTile(z, x, y) {
-    return this.map.layers[z].layer[Math.floor(x/16) + Math.floor(y/16) * this.map.width][1];
+    return this.map.layers[z].layer[Math.floor(x/this.map.tilewidth) + Math.floor(y/this.map.tilewidth) * (this.map.width/this.map.tilewidth)][1];
   }
   /**
    * Gets the number of layers in the map.
