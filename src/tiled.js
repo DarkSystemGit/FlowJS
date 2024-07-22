@@ -221,7 +221,7 @@ export class Map {
    * @param {number} id - The tile id.
    */
   setTile(z, x, y, id) {
-    this.map.layers[z].layer[x + y * this.map.width] = [
+    this.map.layers[z].layer[x + y * (this.map.width/this.map.tilewidth)] = [
       this.map.getTile(id),
       id,
     ];
@@ -235,7 +235,7 @@ export class Map {
    * @returns {number} - The tile id.
    */
   getTile(z, x, y) {
-    return this.map.layers[z].layer[Math.floor(x/this.map.tilewidth) + Math.floor(y/this.map.tilewidth) * (this.map.width/this.map.tilewidth)][1];
+    return this.map.layers[z].layer[x + y * (this.map.width/this.map.tilewidth)][1];
   }
   /**
    * Gets the number of layers in the map.

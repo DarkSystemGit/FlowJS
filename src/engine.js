@@ -16,6 +16,7 @@ import { readFile } from "node:fs/promises";
 import { Texture } from "./texture.js";
 import { Renderer } from "./renderer.js";
 import { Map as TMap } from "./tiled.js";
+import { threadId } from "node:worker_threads";
 /**
  * The Engine class is the main game engine that manages the game loop, rendering, and other core game systems.
  * It takes in a game class, screen dimensions, window title, and scale factor to initialize the game.
@@ -272,6 +273,7 @@ export class Engine {
    * @param {Object} newObj Updated Properties
    */
   changeObject(id, newObj) {
+    try{
     var item;
     Array.from(this.objects.values()).forEach((z) =>
       z.forEach((i, c) => {
@@ -291,7 +293,7 @@ export class Engine {
       item.rotation,
       item.id,
       item.special
-    );
+    );}catch{}
   }
   /** Internal method that actually draws to the screen */
   async _drawObjects() {

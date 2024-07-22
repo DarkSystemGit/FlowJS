@@ -101,7 +101,7 @@ export class GFX {
    */
   fillScreen(color) {
     try {
-      this.engine._clear();
+      //this.engine._clear();
       var fill = new PixelArray(
         this.engine.canvas.width,
         this.engine.canvas.height

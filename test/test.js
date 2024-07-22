@@ -3,29 +3,75 @@ import path from "node:path";
 class Mario extends flow.Sprite {
   onCreate() {
     var mario = this.gfx.getTexture("mario");
+    this.map = this.gfx.getMap("marioMap");
     mario.setDimensions(32, 52);
     this.loadTexture(mario);
-    this.setPosition(0, 464-this.height);
+    //this.setPosition(0, 464 - this.height);
+    this.setPosition(5*16+2, 464 - this.height);
   }
   onFrame() {
-    console.log(this.gfx.getMap("marioMap").getTile(1,this.position.x,this.position.y))
-    if (
-      (!this.inBounds(1280, 640) && !(this.position.y < 0)) ||
-      this.getCollisions().length != 0
-    ) {
-      if (!this.inBoundsX(1280)) this.velocity[0] = 0;
-      if (!this.inBoundsY(640)) {
+    try {
+      var bottom =
+        this.map.getTile(
+          1,
+          Math.ceil(this.position.x / 16),
+          Math.ceil(this.position.y / 16 + 2)
+        ) == 635;
+      var top =
+        this.map.getTile(
+          1,
+          Math.ceil(this.position.x / 16),
+          Math.ceil(this.position.y / 16 - 2)
+        ) == 635;
+      var right =
+        this.map.getTile(
+          1,
+          Math.ceil(this.position.x / 16 + 1),
+          Math.ceil(this.position.y / 16)
+        ) == 635 ||
+        this.map.getTile(
+          1,
+          Math.ceil(this.position.x / 16 + 1),
+          Math.ceil(this.position.y / 16 - 1)
+        ) == 635;
+      var left =
+        this.map.getTile(
+          1,
+          Math.ceil(this.position.x / 16 - 1),
+          Math.ceil(this.position.y / 16)
+        ) == 635 ||
+        this.map.getTile(
+          1,
+          Math.ceil(this.position.x / 16 - 1),
+          Math.ceil(this.position.y / 16 - 1)
+        ) == 635;
+      //console.log(top,bottom,left,right)
+
+      if (left || right) this.velocity[0] = 0;
+      if (bottom) {
         this.velocity[1] = 0;
         this.jumping = false;
       }
-      if(this.velocity[0] < 0) {
-        this.changeVelocity(0.005,0);
+      if (top) {
+        this.velocity[1] = 0;
       }
-      if(this.velocity[0] > 0) {
-        this.changeVelocity(-0.005,0);
+      if (this.velocity[0] < 0 && !right) {
+        this.changeVelocity(0.005, 0);
       }
-    } else {
-      this.changeVelocity(0, 0.01);
+      if (this.velocity[0] > 0 && !left) {
+        this.changeVelocity(-0.005, 0);
+      }
+      if (left) {
+        this.move(0.01, 0);
+      }
+      if (right) {
+        this.move(-0.01, 0);
+      }
+      if (!bottom) this.changeVelocity(0, 0.01);
+    } catch {
+      
+      this.gfx.fillScreen([0, 0, 0, 255]);
+      console.log(this.engine.objects)
     }
   }
   onKeyPress(key) {
@@ -47,13 +93,13 @@ class MyGame extends flow.Game {
     await this.engine.loadAsset(dir("mario.wav"), "marioTrack");
     await this.engine.loadAsset(dir("shader.glsl"), "shader");
     await this.engine.loadAsset(dir("map.json"), "marioMap");
-    this.gfx.draw(0,0,0,this.gfx.getMap("marioMap"));
-    this.engine.setShader('shader')
+    this.gfx.draw(0, 0, 0, this.gfx.getMap("marioMap"));
+    //this.engine.setShader('shader')
     //this.gfx.fillScreen([0, 0, 255, 255]);
     this.addSprite(Mario);
     //var bg = this.gfx.getTexture("marioBg");
     //this.gfx.setLayerBackground(0, bg);
-    this.audio.play('marioTrack',200,true)
+    this.audio.play("marioTrack", 200, true);
   }
 }
 new flow.Engine({
