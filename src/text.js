@@ -50,6 +50,18 @@ export class TextManager {
     }
   }
 }
+/**
+ * Represents a text object with various properties for rendering text.
+ *
+ * @class Text
+ * @param {string} [text=''] - The text content.
+ * @param {boolean} [ui=false] - Whether the text is part of the UI.
+ * @param {number} [width=0] - The width of the text.
+ * @param {number} [height=0] - The height of the text.
+ * @param {number[]} [color=[0, 0, 0, 255]] - The RGBA color of the text.
+ * @param {string} [font='Arial'] - The font family of the text.
+ * @param {number} [size=12] - The font size of the text.
+ */
 export class Text {
   constructor(
     text='',
@@ -69,6 +81,7 @@ export class Text {
     this.font = `${size}px ${font}`;
     this.ui = ui;
   }
+  
   setText(text) {
     this.text = text;
   }
