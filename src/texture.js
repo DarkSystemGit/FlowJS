@@ -34,7 +34,7 @@ export class PixelArray {
   getShape() {
     return this.obj.shape;
   }
-  /** Get the array's rotation angle
+  /** Get the array's rotation angle (Not implemented)
    * @returns {Number}
    */
   getAngle() {
@@ -45,13 +45,13 @@ export class Texture extends PixelArray {
   constructor(...args) {
     super(...args);
   }
-  /**
+  /*/**
    * Rotates a Texture
    * @param {Number} degrees Degrees to rotate
-   */
+   *
   rotate(degrees) {
     this.rotation = degrees;
-  }
+  }*/
   /**
    * Resizes a texture to a specific size
    * @param {Number} width
@@ -66,8 +66,8 @@ export class Texture extends PixelArray {
   /**
    * Gets rotation angle
    * @returns {Number} angle
-   */
+   *
   getAngle() {
     return this.rotation;
-  }
+  }*/
 }

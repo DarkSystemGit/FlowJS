@@ -1,7 +1,8 @@
 import Canvas from "canvas";
-import { PixelArray } from "./texture.js";
+import { PixelArray,Texture } from "./texture.js";
 import { err } from "./utils.js";
 import { Map } from "./tiled.js";
+import { Text } from "./text.js";
 export class GFX {
   /**
    * Drawing interface
@@ -16,11 +17,12 @@ export class GFX {
    * @param {Number} x X cord
    * @param {Number} y Y cord
    * @param {Number} z Z cord
-   * @param {PixelArray|Texture|Map} pixels PixelArray, Texture or Map to draw
+   * @param {PixelArray|Texture|Map|Text} pixels PixelArray, Texture, Text or Map to draw
    * @returns {Number}
    */
   draw(x, y, z, pixels) {
     if(pixels instanceof Map)return this.engine.drawMap(pixels,x,y,z)
+    if(pixels instanceof Text)return this.engine.drawText(pixels,x,y,z)
     return this.engine.draw(
       Canvas.createImageData(pixels._getData(), ...pixels.getShape()),
       x,
@@ -96,10 +98,10 @@ export class GFX {
     }
   }
   /**
-   * Fills the screen with a color
+   * Fills a layer with a color
    * @param {Array<number>} color RGBA color
    */
-  fillScreen(color) {
+  fillLayer(layer,color) {
     try {
       //this.engine._clear();
       var fill = new PixelArray(
@@ -107,7 +109,7 @@ export class GFX {
         this.engine.canvas.height
       );
       fill.fill(color || [0, 0, 0, 255]);
-      this.draw(0, 0, -Infinity, fill, ["fs", color]);
+      this.draw(0, 0, layer, fill, ["fs", color]);
     } catch {
       err(`Error while filling screen`);
     }

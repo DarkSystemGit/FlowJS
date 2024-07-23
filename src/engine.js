@@ -17,6 +17,7 @@ import { Texture } from "./texture.js";
 import { Renderer } from "./renderer.js";
 import { Map as TMap } from "./tiled.js";
 import { threadId } from "node:worker_threads";
+import { TextManager } from "./text.js";
 /**
  * The Engine class is the main game engine that manages the game loop, rendering, and other core game systems.
  * It takes in a game class, screen dimensions, window title, and scale factor to initialize the game.
@@ -76,6 +77,7 @@ export class Engine {
       this.camera = [0, 0];
       this.keyboard = [[0, 0]];
       this.audio = new AudioManager();
+      this.text=new TextManager(this.ctx);
       this.assets = new AssetManager(this.audio);
       this.maps = [];
       this.utils = {
@@ -241,7 +243,7 @@ export class Engine {
   }
   /**
    * Draws a map to the screen
-   * @param {String} map Map
+   * @param {Map} map Map
    * @param {Number} x X cord
    * @param {Number} y Y cord
    * @param {Number} z Z cord
@@ -253,6 +255,18 @@ export class Engine {
       ids.push(i+z)
     }
     this.maps.push({map,x,y,ids,obj:[]});
+  }
+  /**
+   * Draws text to the screen
+   * @param {Text} text 
+   * @param {Number} x 
+   * @param {Number} y 
+   * @param {Number} z 
+   */
+  drawText(text,x,y,z){
+    text.x=x||0
+    text.y=y||0
+    this.draw(undefined,text.x,text.y,z,[text.width,text.height],undefined,undefined,['txt',text])
   }
   _onFrame() {
     this.maps.forEach((map)=>{
@@ -326,7 +340,12 @@ export class Engine {
             this.ctx.rect(0, 0, this.canvas.width, this.canvas.height);
             this.ctx.fillStyle = `rgba(${item.special[1].join(",")})`;
             this.ctx.fill();
-          } else {
+          } else if (item.special && item.special[0] == "txt") {
+            var text=item.special[1]
+            text.x=item.x + (!text.ui ?-1 * this.camera[0]:0)
+            text.y=item.y + (!text.ui ?-1 * this.camera[1]:0)
+            this.text.drawText(text)
+          }else {
             this.ctx.drawImage(
               createImageBitmap(item.pixels, ...item.shape),
               item.x + -1 * this.camera[0],

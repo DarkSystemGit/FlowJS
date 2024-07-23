@@ -7,7 +7,7 @@ class Mario extends flow.Sprite {
     mario.setDimensions(32, 52);
     this.loadTexture(mario);
     //this.setPosition(0, 464 - this.height);
-    this.setPosition(5*16+2, 464 - this.height);
+    this.setPosition(5*16+2, 719 - this.height);
   }
   onFrame() {
     try {
@@ -70,8 +70,8 @@ class Mario extends flow.Sprite {
       if (!bottom) this.changeVelocity(0, 0.01);
     } catch {
       
-      this.gfx.fillScreen([0, 0, 0, 255]);
-      console.log(this.engine.objects)
+      this.gfx.fillLayer(Infinity,[0, 0, 0, 255]);
+      this.gfx.draw(1280/2-250/2, 720/2, Infinity,new flow.Text("Game Over",true,1000,100,[255,255,255,255],"Arial",50));
     }
   }
   onKeyPress(key) {
