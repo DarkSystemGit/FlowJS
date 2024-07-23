@@ -2,7 +2,7 @@
 
 Supercharge your Node.JS game development with FlowJS! 🚀 This lightweight and efficient library provides all the essential building blocks for crafting awesome 2D games.  It's packed with features to handle rendering, input, sprites, and more! 
 
-## Features that'll make you go 🤩
+## Features!
 
 - **Asset Management:** Effortlessly load and manage textures, sounds, and other game assets.
 - **Sprite Rendering:**  Render sprites with smooth animations, transformations, and even custom shaders for that extra sparkle! ✨
@@ -16,7 +16,7 @@ Just simply run:
 npm install flowjs
 ```
 
-## How to Use It 
+## Usage
 
 1. **Import FlowJS into your project:**
 
