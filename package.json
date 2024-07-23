@@ -1,5 +1,5 @@
 {
-  "name": "flowjs",
+  "name": "flowgame",
   "version": "0.0.1",
   "description": "A Node.JS Game Engine",
   "main": "./src/main.js",
