@@ -1,11 +1,11 @@
 {
   "name": "flowgame",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A Node.JS Game Engine",
   "main": "./src/main.js",
   "type": "module",
   "types": "./types/main.d.ts",
-  "engines": {"node": ">=16 =<20"},
+  "engines": {"node": ">=16 <21"},
   "scripts": {
     "types": "npx tsc "
   },
