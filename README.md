@@ -1,6 +1,6 @@
-# FlowJS - A Node.JS Game Engine Library ✨
+# FlowJS - A Node.JS Game Engine ✨
 
-Supercharge your Node.JS game development with FlowJS! 🚀 This lightweight and efficient library provides all the essential building blocks for crafting awesome 2D games.  Think of it as your trusty sidekick, packed with features to handle rendering, input, sprites, and more! 
+Supercharge your Node.JS game development with FlowJS! 🚀 This lightweight and efficient library provides all the essential building blocks for crafting awesome 2D games.  It's packed with features to handle rendering, input, sprites, and more! 
 
 ## Features that'll make you go 🤩
 
