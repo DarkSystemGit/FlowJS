@@ -1,13 +1,12 @@
 {
   "name": "flowjs",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A Node.JS Game Engine",
   "main": "./src/main.js",
   "type": "module",
   "types": "./types/main.d.ts",
   "engines": {"node": ">=16 =<20"},
   "scripts": {
-    "test": "node ./test/test.js",
     "types": "npx tsc "
   },
   "keywords": [
@@ -16,7 +15,7 @@
     "js"
   ],
   "author": "DarkSystem",
-  "license": "GPL-3.0-or-later",
+  "license": "MIT",
   "dependencies": {
     "@kmamal/gl": "^8.0.2-6",
     "@kmamal/sdl": "^0.10.7",
