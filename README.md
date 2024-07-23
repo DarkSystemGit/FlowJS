@@ -13,7 +13,7 @@ Supercharge your Node.JS game development with FlowJS! 🚀 This lightweight and
 ## Installation (It's a snap!)
 Just simply run:
 ```bash
-npm install flowjs
+npm install flowgame
 ```
 
 ## Usage
@@ -21,7 +21,7 @@ npm install flowjs
 1. **Import FlowJS into your project:**
 
 ```js
-import flow from 'flowjs';
+import flow from 'flowgame';
 ```
 
 2. **Create an Game instance:**
