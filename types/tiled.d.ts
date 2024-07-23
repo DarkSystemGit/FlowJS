@@ -10,6 +10,7 @@ export class Map {
         getTile: (id: any) => any;
         width: number;
         height: number;
+        tilewidth: any;
     };
     width: number;
     height: number;

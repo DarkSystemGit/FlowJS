@@ -81,17 +81,34 @@ export class Text {
     this.font = `${size}px ${font}`;
     this.ui = ui;
   }
-  
+  /**
+   * Sets the string to be displayed
+   * @param {String} text 
+   */
   setText(text) {
     this.text = text;
   }
+  /**
+   * Sets the text block's dimensions
+   * @param {Number} width 
+   * @param {Number} height 
+   */
   setDimensions(width, height) {
     this.width = width || this.width;
     this.height = height || this.height;
   }
+  /**
+   * Sets the text's color
+   * @param {Number[]} color 
+   */
   setColor(color) {
     this.color = `rgb(${color.join(",")})`;
   }
+  /**
+   * Sets the font and size
+   * @param {String} font 
+   * @param {Number} size 
+   */
   setFont(font, size) {
     this.font = `${size}px ${font}`;
   }

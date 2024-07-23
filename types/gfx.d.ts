@@ -11,10 +11,10 @@ export class GFX {
      * @param {Number} x X cord
      * @param {Number} y Y cord
      * @param {Number} z Z cord
-     * @param {PixelArray|Texture|Map} pixels PixelArray, Texture or Map to draw
+     * @param {PixelArray|Texture|Map|Text} pixels PixelArray, Texture, Text or Map to draw
      * @returns {Number}
      */
-    draw(x: number, y: number, z: number, pixels: PixelArray | Texture | Map): number;
+    draw(x: number, y: number, z: number, pixels: PixelArray | Texture | Map | Text): number;
     /**
      * Moves a Object around the screen
      * @param {Number} id Object ID
@@ -47,10 +47,10 @@ export class GFX {
      */
     rotateObject(id: number, degrees: number): void;
     /**
-     * Fills the screen with a color
+     * Fills a layer with a color
      * @param {Array<number>} color RGBA color
      */
-    fillScreen(color: Array<number>): void;
+    fillLayer(layer: any, color: Array<number>): void;
     /** Gets an asset's texture
      * @param {String} texture
      * @returns {Texture} Asset texture
@@ -74,4 +74,6 @@ export class GFX {
     updateEngine(engine: Engine): void;
 }
 import { PixelArray } from "./texture.js";
+import { Texture } from "./texture.js";
 import { Map } from "./tiled.js";
+import { Text } from "./text.js";

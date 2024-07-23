@@ -25,6 +25,7 @@ export class Engine {
     camera: number[];
     keyboard: number[][];
     audio: AudioManager;
+    text: TextManager;
     assets: AssetManager;
     maps: any[];
     utils: {
@@ -107,12 +108,20 @@ export class Engine {
     getMap(name: string): any;
     /**
      * Draws a map to the screen
-     * @param {String} map Map
+     * @param {Map} map Map
      * @param {Number} x X cord
      * @param {Number} y Y cord
      * @param {Number} z Z cord
      */
-    drawMap(map: string, x: number, y: number, z: number): void;
+    drawMap(map: Map<any, any>, x: number, y: number, z: number): void;
+    /**
+     * Draws text to the screen
+     * @param {Text} text
+     * @param {Number} x
+     * @param {Number} y
+     * @param {Number} z
+     */
+    drawText(text: Text, x: number, y: number, z: number): void;
     _onFrame(): void;
     /**
      *  Changes an object
@@ -201,4 +210,5 @@ export class AssetManager {
 }
 import { Renderer } from "./renderer.js";
 import { AudioManager } from "./audio.js";
+import { TextManager } from "./text.js";
 import { Texture } from "./texture.js";

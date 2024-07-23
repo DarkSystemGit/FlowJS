@@ -5,9 +5,10 @@
   "main": "./src/main.js",
   "type": "module",
   "types": "./types/main.d.ts",
+  "engines": {"node": ">=16 =<20"},
   "scripts": {
     "test": "node ./test/test.js",
-    "types": "npx tsc --noEmit false --emitDeclarationOnly true --declaration --declarationDir ./types"
+    "types": "npx tsc "
   },
   "keywords": [
     "game",

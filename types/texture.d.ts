@@ -23,7 +23,7 @@ export class PixelArray {
      * @returns {Array<Number>}
      */
     getShape(): Array<number>;
-    /** Get the array's rotation angle
+    /** Get the array's rotation angle (Not implemented)
      * @returns {Number}
      */
     getAngle(): number;
@@ -31,15 +31,10 @@ export class PixelArray {
 export class Texture extends PixelArray {
     constructor(...args: any[]);
     /**
-     * Rotates a Texture
-     * @param {Number} degrees Degrees to rotate
-     */
-    rotate(degrees: number): void;
-    rotation: number;
-    /**
      * Resizes a texture to a specific size
      * @param {Number} width
      * @param {Number} height
      */
     setDimensions(width: number, height: number): void;
+    rotation: number;
 }
