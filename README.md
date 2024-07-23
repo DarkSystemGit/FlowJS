@@ -1,6 +1,6 @@
 # FlowJS - A Node.JS Game Engine Library ✨
 
-Supercharge your Node.JS game development with FlowJS! 🚀 This lightweight and efficient library provides all the essential building blocks for crafting awesome 2D games.  Think of it as your trusty sidekick, packed with features to handle rendering, input, sprites, and more! 🦸‍♀️🦸‍♂️
+Supercharge your Node.JS game development with FlowJS! 🚀 This lightweight and efficient library provides all the essential building blocks for crafting awesome 2D games.  Think of it as your trusty sidekick, packed with features to handle rendering, input, sprites, and more! 
 
 ## Features that'll make you go 🤩
 
@@ -12,17 +12,21 @@ Supercharge your Node.JS game development with FlowJS! 🚀 This lightweight and
 
 ## Installation (It's a snap!)
 Just simply run:
-```npm install flowjs```
+```bash
+npm install flowjs
+```
 
-## How to Use It (Let's get this party started! 🎉)
+## How to Use It 
 
 1. **Import FlowJS into your project:**
 
-```import flow from 'flowjs';```
+```js
+import flow from 'flowjs';
+```
 
 2. **Create an Game instance:**
 
-```
+```js
 class MyGame extends flow.Game {
   async onCreate() {
     //...creation code here...
@@ -33,11 +37,13 @@ class MyGame extends flow.Game {
 
 3. **Load your assets:**
  
- ```await engine.loadAsset('./assets/player.png', 'player');```
+ ```js
+ await engine.loadAsset('./assets/player.png', 'player');
+```
 
 4. **Create your sprites:**
 
-```
+```js
 class Player extends flow.Sprite {
   onCreate() {
     this.loadTexture("player");
@@ -52,13 +58,13 @@ class Player extends flow.Sprite {
 ```
 5. **Load your sprites**
 
-```
+```js
 async onCreate() {
     //...other creation code here...
     this.addSprite(Player)
   }
   ```
 6. **And start your game!**
-```
-new flow.Engine(MyGame, {width:1280, height:720, title:"Game"});
+```js
+new flow.Engine({game:MyGame, window:{width:1280, height:720, title:"Game"}});
 ```
