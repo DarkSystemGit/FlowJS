@@ -103,7 +103,7 @@ export class Engine {
           handler._onFrame(a);
         }) || function () {};
       //very slow,loading screen needed
-      await handler.onCreate(this);
+      handler.onCreate(this).then(()=>{setImmediate(gameLoop)})
       var gameLoop = async () => {
         this._handleEvents();
         this.onFrame(this);
@@ -113,7 +113,7 @@ export class Engine {
         );
         setImmediate(gameLoop);
       };
-      setImmediate(gameLoop);
+      
       return this;
     })();
   }
@@ -123,6 +123,10 @@ export class Engine {
    * @param {String} name Name of asset
    */
   async loadAsset(path, name) {
+    await this._drawObjects();
+        this.window.render(
+          this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
+        );
     if ([".wav", ".mp3", ".ogg"].includes(npath.extname(path)))
       return await this.assets.loadAudio(path, name);
     if ([".png", ".jpeg"].includes(npath.extname(path)))

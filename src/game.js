@@ -66,7 +66,7 @@ export class Game {
    */
   _onFrame() {
     this.sprites.forEach((s) => (s ? s.render() : undefined));
-    (this.onFrame || (() => {}))();
+    if(this.onFrame)this.onFrame()
   }
   /** Adds a Sprite to be drawn
    * @param {Sprite} sprite
