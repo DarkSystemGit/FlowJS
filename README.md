@@ -66,5 +66,10 @@ async onCreate() {
   ```
 6. **And start your game!**
 ```js
-new flow.Engine({game:MyGame, window:{width:1280, height:720, title:"Game"}});
+new flow.Engine({game:MyGame, window:{width:1280, height:720,title:"Game"}});
 ```
+
+## Changelog
+1. July 23, Version 0.0.1, Initial Release
+2. July 23, Version 0.0.2, Minor bugfixes for the first version
+3. July 25, Version 0.0.3, Major bugfixes for the Game class
